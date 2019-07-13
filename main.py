@@ -1,14 +1,17 @@
 import collections
 
-from colorama import Fore
+from colorama import Fore, Back
 
 from environment import Environment
 from store import Store
+
+store = Store()
 
 
 class Stack:
     def __init__(self):
         self.stack = collections.deque()
+        self.call_stack = collections.deque()
 
     def push(self, x):
         self.stack.append(x)
@@ -18,6 +21,17 @@ class Stack:
 
     def empty(self):
         return len(self.stack) == 0
+
+    def size(self):
+        return len(self.stack)
+
+    def enter(self):
+        self.call_stack.append(len(self.stack))
+
+    def leave(self):
+        last = self.call_stack.pop()
+        while len(self.stack) != last:
+            self.stack.pop()
 
 
 class Instruction:
@@ -33,6 +47,9 @@ class DeclarationInstr(Instruction):
         print("run decl inst")
         env.define(self.id)
 
+    def __str__(self):
+        return "DECLARE" + " " + self.id
+
 
 class AssignVarValInstr(Instruction):
     def __init__(self, id: str, val):
@@ -42,6 +59,9 @@ class AssignVarValInstr(Instruction):
     def run(self, env, stack):
         print("run assign var val")
         env.assign(self.id, self.val.construct(env))
+
+    def __str__(self):
+        return "ASSIGN" + " " + self.id + " " + str(self.val)
 
 
 class AssignVarVarInstr(Instruction):
@@ -56,6 +76,9 @@ class AssignVarVarInstr(Instruction):
         env.assign(self.id, env.get(self.var))
         print("D IS: ", env.get('d'))
 
+    def __str__(self):
+        return "ASSIGN" + " " + self.id + " " + self.var
+
 
 class ProcCallInstr(Instruction):
     def __init__(self, id: str, args: [str]):
@@ -66,22 +89,62 @@ class ProcCallInstr(Instruction):
         proc_val = env.get(self.id)
 
         if proc_val.builtin:
-            print(Fore.CYAN, " CALLING ", Fore.RESET)
+            print(Fore.CYAN, " CALLING BUILTIN WITH ARGS", Fore.RESET)
+            print(Fore.CYAN, self.args, Fore.RESET)
             val = proc_val.body([env.get(arg) for arg in self.args])
             # env.define('_return')
             # print("VALUE: ::", val)
             env.assign('__return__', val)
             return
+        args_val = [env.get(arg) for arg in self.args]
+        print("ARGS: ", self.args)
+        print("AND STORE: ", store)
 
         env = proc_val.closure.copy()
         print("################PARAMETERS: ", proc_val.params)
-        args_val = [env.get(arg) for arg in self.args]
+
         for i, param in enumerate(proc_val.params):
             env.define(param)
             env.assign(param, args_val[i])
-        for statement in reversed(proc_val.body):
+            print("ASSIGNING: ", param, " VALUE: ", args_val[i])
+        # for statement in reversed(proc_val.body):
+        #     # print("PUSHED: ", statement, "ENV: ", env)
+        #     stack.push((statement, env))
+        print(Back.GREEN)
+        print(Fore.BLACK)
+        print("ENV BEFORE RUNNING BODY OF ", self.id, ": ", env)
+        print("AND STORE: ", store)
+        print(Back.RESET)
+        print(Fore.RESET)
+        stack.enter()
+        proc_val.body.run(env, stack)
+
+    def __str__(self):
+        return "CALL" + " " + self.id + " " + str(self.args)
+
+
+class BlockInstr(Instruction):
+    def __init__(self, statements: [Instruction]):
+        self.statements = statements
+
+    def run(self, env, stack):
+        # print(Fore.RED)
+
+        # print("RUNNING BLOCK")
+        # print(Fore.RESET)
+        for statement in reversed(self.statements):
             # print("PUSHED: ", statement, "ENV: ", env)
             stack.push((statement, env))
+
+
+class IfInstr(Instruction):
+    def __init__(self, cond_var: str, then: [Instruction]):
+        self.cond_var = cond_var
+        self.then = then
+
+    def run(self, env, stack):
+        if env.get(self.cond_var):
+            self.then.run(env, stack)
 
 
 class ReturnInstr(Instruction):
@@ -89,10 +152,31 @@ class ReturnInstr(Instruction):
         self.id = id
 
     def run(self, env, stack):
+        # print("ENV RETURN: ", env)
+        # print("STORE RETURN: ", store)
+        # print("RETURNING: ", self.id)
         env.assign("__return__", env.get(self.id))
+        # print("RETURN NOW IS: ", env.get("__return__"))
+        # print("ENV RETURN: ", env)
+        # print("STORE RETURN: ", store)
+        stack.leave()
 
 
 class Number:
+    def __init__(self, value):
+        self.value = value
+
+    def construct(self, env):
+        return self
+
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class String:
     def __init__(self, value):
         self.value = value
 
@@ -130,18 +214,28 @@ class Proc:
 
 
 def _print(x):
-    print(Fore.RED, "PRINT GREEN", Fore.RESET)
-    print(Fore.GREEN, x, Fore.RESET)
+    print(Back.RED, "PRINT GREEN", Back.RESET)
+    print(Back.GREEN, x, Back.RESET)
 
 
 def _sum(x):
     print(x)
-    return x[0].value + x[1].value
+    return Number(x[0].value + x[1].value)
 
 
 def _sub(x):
     print(x)
-    return x[0].value - x[1].value
+    return Number(x[0].value - x[1].value)
+
+
+def _mul(x):
+    print(x)
+    return Number(x[0].value * x[1].value)
+
+
+def _div(x):
+    print(x)
+    return Number(x[0].value / x[1].value)
 
 
 def _booleq(x):
@@ -155,12 +249,14 @@ def _boolneq(x):
 
 
 builtin_print = ProcVal(None, _print, None, True)
+
 builtin_sum = ProcVal(None, _sum, None, True)
 builtin_sub = ProcVal(None, _sub, None, True)
+builtin_mul = ProcVal(None, _mul, None, True)
+builtin_div = ProcVal(None, _div, None, True)
+
 builtin_booleq = ProcVal(None, _booleq, None, True)
 builtin_boolneq = ProcVal(None, _boolneq, None, True)
-
-store = Store()
 
 env = Environment(store, '0')
 
@@ -173,6 +269,12 @@ env.assign('sum', builtin_sum)
 env.define('sub')
 env.assign('sub', builtin_sub)
 
+env.define('mul')
+env.assign('mul', builtin_mul)
+
+env.define('div')
+env.assign('div', builtin_div)
+
 env.define('booleq')
 env.assign('booleq', builtin_booleq)
 
@@ -184,24 +286,24 @@ stack = Stack()
 env.define("__return__")
 
 prog = [
-    (DeclarationInstr('a'), env),  # var a;
-    (AssignVarValInstr('a', Number(21)), env),  # a = 2;
-    (DeclarationInstr('b'), env),  # var b;
-    (AssignVarVarInstr('b', 'a'), env),  # b = a;
-    (AssignVarValInstr('b', Proc(['d'], [DeclarationInstr('aux'),  # b = proc(d) {
-                                         AssignVarValInstr('aux', Number(5)),  # var aux = 5;
-                                         ProcCallInstr('sum', ['d', 'aux']),  # d = sum(d,aux)
-                                         AssignVarVarInstr('d', '__return__'),  # return d;
-                                         ReturnInstr('d')])), env),  # }
-    # b = proc (d) {d = d + 7; return d;};
-    (DeclarationInstr('c'), env),  # var c;
-    (AssignVarValInstr('c', Number(7)), env),  # c = 7;
-    (ProcCallInstr('b', ['a']), env),  # b(a)
-    (DeclarationInstr('x'), env),
-    (DeclarationInstr('y'), env),
-    (AssignVarValInstr('x', Number(9)), env),  # c = 7;
-    (AssignVarValInstr('y', Number(7)), env),  # c = 7;
-    (ProcCallInstr('boolneq', ['x', 'y']), env)
+    (DeclarationInstr('factorial'), env),  # var a;
+    (AssignVarValInstr('factorial', Proc(['n'], BlockInstr([
+        DeclarationInstr('aux'),
+        AssignVarValInstr('aux', Number(0)),
+        ProcCallInstr('booleq', ['n', 'aux']),
+        IfInstr('__return__',
+                BlockInstr([DeclarationInstr('one'), AssignVarValInstr('one', Number(1)), ReturnInstr('one')])),
+        DeclarationInstr('aux1'),
+        AssignVarValInstr('aux1', Number(1)),
+        ProcCallInstr('sub', ['n', 'aux1']),
+        ProcCallInstr('factorial', ['__return__']),
+        ProcCallInstr('mul', ['__return__', 'n']),
+        ReturnInstr('__return__')
+    ]
+    ))), env),  # }
+    (DeclarationInstr('n'), env),
+    (AssignVarValInstr('n', Number(10)), env),
+    (ProcCallInstr('factorial', ['n']), env)
 ]
 
 for s in reversed(prog):
@@ -209,12 +311,11 @@ for s in reversed(prog):
 
 while not stack.empty():
     x = stack.pop()
-    print("X: ", x)
     statement, m_env = x
-    print("STAT: ", statement)
-    print(id(m_env), " ENV: ", m_env)
+    print(Back.YELLOW + Fore.BLACK, "STAT: ", statement, Back.RESET + Fore.RESET)
+
     statement.run(m_env, stack)
-    print(store)
-    print(id(m_env), " ENV: ", m_env)
-    # print(statement)
+    print(" ENV: ", m_env)
+    print(" STORE: ", store)
+
 print(id(env), " ENV: ", env)
