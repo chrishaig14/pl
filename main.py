@@ -1,3 +1,4 @@
+from compiler.compiler import Compiler
 from runtime.runtime import Runtime, DeclarationInstr, AssignVarValInstr, BlockInstr, Proc, ProcCallInstr, IfInstr, \
     ReturnInstr, Number
 
@@ -22,5 +23,18 @@ prog = [
     ProcCallInstr('factorial', ['n'])
 ]
 
-runtime = Runtime()
-runtime.run(prog)
+source = open("sample1.aspl")
+source = source.read()
+
+print("SOURCE IS: ", source)
+
+compiler = Compiler()
+prog = compiler.compile(source)
+
+print("FINAL:")
+
+for x in prog:
+    print(x)
+
+# runtime = Runtime()
+# runtime.run(prog)

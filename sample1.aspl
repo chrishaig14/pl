@@ -1,0 +1,4 @@
+var x = y + 7;
+var sum = fun(z){
+	return sum(z+1) + z;
+};

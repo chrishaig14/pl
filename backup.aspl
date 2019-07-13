@@ -1,0 +1,23 @@
+var z;
+z = 10;
+var plus_z;
+var sum;
+var extra;
+extra = 10;
+var before_sum;
+sum = fun (a, b){
+
+	return a + extra+ b;
+};
+var before_plus;
+plus_z = fun (x, y){
+	var extra;
+	extra = 5;
+	return x + sum(y,z);
+};
+var after_plus;
+var __retval;
+extra = 11;
+__retval = plus_z(1,3);
+var before_print;
+print(__retval);
