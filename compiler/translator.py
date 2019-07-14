@@ -68,6 +68,8 @@ class Translator:
         fun_id = ""
         if expression.op == "plus":
             fun_id = "sum"
+        if expression.op == "minus":
+            fun_id = "sub"
         fc = FunctionCall(None)
         fc.id = fun_id
         f = expression.first.accept(self)
