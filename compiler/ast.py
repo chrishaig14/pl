@@ -40,8 +40,14 @@ class Array:
     def accept(self, visitor):
         return visitor.visit_array(self)
 
-    def __str__(self):
-        return "(array " + str([str(s) for s in self.values]) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "array"
+        json["values"] = [s.to_json() for s in self.values]
+        return json
+
+    def __repr__(self):
+        return str(self.to_json())
 
 
 class Block:
@@ -51,18 +57,16 @@ class Block:
     def accept(self, visitor):
         return visitor.visit_block(self)
 
-    def __str__(self):
-        # print("PRINTING BLOCK")
-        x = "(block "
+    def to_json(self):
+        json = {}
+        json["type"] = "block"
+        json["statements"] = []
         for s in self.statements:
-            # print("STAT:", str(s))
-            x += str(s)
-        x += ")"
-        # print("X: ", x)
-        return x
+            json["statements"].append(s.to_json())
+        return json
 
     def __repr__(self):
-        return str(self)
+        return str(self.to_json())
 
 
 class If:
@@ -73,11 +77,14 @@ class If:
     def accept(self, visitor):
         return visitor.visit_if(self)
 
-    def __str__(self):
-        return "(if " + str(self.cond) + " " + str(self.then) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "if"
+        json["then"] = self.then.to_json()
+        return json
 
     def __repr__(self):
-        return str(self)
+        return str(self.to_json())
 
 
 class FunctionCall:
@@ -92,16 +99,17 @@ class FunctionCall:
     def accept(self, visitor):
         return visitor.visit_function_call(self)
 
-    def __str__(self):
-        string = "(function_call " + self.id + " ["
+    def to_json(self):
+        json = {}
+        json["type"] = "function_call"
+        json["args"] = []
+
         for arg in self.args:
-            string += str(arg) + ","
-        string = string[:-1]
-        string += "])"
-        return string
+            json["args"].append(arg.to_json())
+        return json
 
     def __repr__(self):
-        return str(self)
+        return str(self.to_json())
 
 
 class Expression:
@@ -113,12 +121,15 @@ class Expression:
     def accept(self, visitor):
         return visitor.visit_expression(self)
 
-    def __str__(self):
-        return "(" + self.op + " " + str(self.first) + \
-               " " + str(self.second) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "expression"
+        json["first"] = self.first.to_json()
+        json["second"] = self.second.to_json()
+        return json
 
     def __repr__(self):
-        return str(self)
+        return str(self.to_json())
 
 
 class Declaration:
@@ -129,11 +140,18 @@ class Declaration:
     def accept(self, visitor):
         return visitor.visit_declaration(self)
 
-    def __str__(self):
-        return "(declare " + self.id + " " + str(self.init) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "declaration"
+        json["id"] = self.id
+        if self.init is not None:
+            json["init"] = self.init.to_json()
+        else:
+            json["init"] = None
+        return json
 
     def __repr__(self):
-        return str(self)
+        return str(self.to_json())
 
 
 class String:
@@ -143,41 +161,33 @@ class String:
     def accept(self, visitor):
         return self.string
 
-    def __str__(self):
-        return "(string " + self.string + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "string"
+        json["value"] = self.string
+        return json
+
+    def __repr__(self):
+        return str(self.to_json())
 
 
 class Function:
     def __init__(self, node):
         self.params = [par["data"] for par in node["params"]]
         self.statements = make_ast_node(node["statements"])
-        # logger.debug(
-        #     Back.YELLOW +
-        #     Fore.BLACK,
-        #     "NEW CLOSURE FOR FUNCTION",
-        #     Back.RESET +
-        #     Fore.RESET)
-        # self.closure = env.copy()
-        # self.closure.name = "CLOSURE FOR FUNCTION"
-        # self.closure.store = env.store  # not SO DEEP COPY, MAINTAIN UNIQUE STORE
-        # logger.debug(
-        #     Back.RED +
-        #     Fore.WHITE,
-        #     "CLOSURE: ",
-        #     self.closure,
-        #     Back.RESET +
-        #     Fore.RESET)
 
     def accept(self, visitor):
         return visitor.visit_function(self)
 
-    def __str__(self):
-        # return "FUN_STR"
-        return "(fun " + str(self.params) + " " + \
-               str(self.statements) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "function"
+        json["params"] = self.params
+        json["statements"] = [s.to_json() for s in self.statements]
+        return json
 
     def __repr__(self):
-        return "FUN_REPR"
+        return str(self.to_json())
 
 
 class Return:
@@ -187,8 +197,14 @@ class Return:
     def accept(self, visitor):
         return visitor.visit_return(self)
 
-    def __str__(self):
-        return "(return " + str(self.exp) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "return"
+        json["exp"] = self.exp.to_json()
+        return json
+
+    def __repr__(self):
+        return str(self.to_json())
 
 
 class Variable:
@@ -198,8 +214,14 @@ class Variable:
     def accept(self, visitor):
         return visitor.visit_variable(self)
 
-    def __str__(self):
-        return "(variable " + self.id + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "variable"
+        json["id"] = self.id
+        return json
+
+    def __repr__(self):
+        return str(self.to_json())
 
 
 class Number:
@@ -209,8 +231,14 @@ class Number:
     def accept(self, visitor):
         return visitor.visit_number(self)
 
-    def __str__(self):
-        return "(number " + str(self.number) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "number"
+        json["value"] = self.number
+        return json
+
+    def __repr__(self):
+        return str(self.to_json())
 
 
 class Assignment:
@@ -221,8 +249,12 @@ class Assignment:
     def accept(self, visitor):
         return visitor.visit_assignment(self)
 
-    def __str__(self):
-        return "(assign " + str(self.lvalue) + " " + str(self.rvalue) + ")"
+    def to_json(self):
+        json = {}
+        json["type"] = "assignment"
+        json["id"] = self.lvalue
+        json["exp"] = self.rvalue.to_json()
+        return json
 
     def __repr__(self):
-        return str(self)
+        return str(self.to_json())

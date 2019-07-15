@@ -1,4 +1,12 @@
+var y;
 var x = y + 7;
+var k = 1;
 var sum = fun(z){
-	return sum(z-1) + z;
+	var w;
+	if (w == 7){
+		
+		return x + w;
+	}
+	return suma(z-1) + z;
 };
+var wawa = k + 1;

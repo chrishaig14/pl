@@ -3,8 +3,7 @@ from colorama import Back, Fore
 from compiler import logger
 from compiler.ast import FunctionCall
 
-
-class Translator:
+class FromOpToProcCall:
     def __init__(self):
         pass
 

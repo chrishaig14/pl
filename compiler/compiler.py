@@ -1,10 +1,11 @@
-
 # import logger
 from compiler import logger
+from compiler.ScopeAnalyzer import ScopeAnalyzer
 from compiler.ast import make_ast_node
+from compiler.extract_args_to_var import ExtractArgsToVar
 from compiler.parser import Parser
 from compiler.scanner import Scanner
-from compiler.translator import Translator
+from compiler.translator import FromOpToProcCall
 
 logger.ACTIVE = False
 logger.DEBUG = True
@@ -40,6 +41,14 @@ class Compiler:
             prog.append(node)
             # print(node)
 
-        translator = Translator()
-        ir = translator.translate(prog)
+        scope_analyzer = ScopeAnalyzer()
+
+        ir = scope_analyzer.analyze(prog)
+
+        # translator = FromOpToProcCall()
+        # ir = translator.translate(prog)
+
+        # translator = ExtractArgsToVar(ir)
+        # ir = translator.translate(ir)
+
         return ir
