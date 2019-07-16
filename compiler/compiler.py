@@ -1,11 +1,12 @@
 # import logger
 from compiler import logger
 from compiler.ScopeAnalyzer import ScopeAnalyzer
-from compiler.ast import make_ast_node
+# from compiler.ast import make_ast_node
 from compiler.extract_args_to_var import ExtractArgsToVar
 from compiler.parser import Parser
 from compiler.scanner import Scanner
 from compiler.translator import FromOpToProcCall
+from compiler.tree_to_json import TreeToJson
 
 logger.ACTIVE = False
 logger.DEBUG = True
@@ -16,15 +17,18 @@ class Compiler:
         pass
 
     def compile(self, source):
-
         scanner = Scanner(source)
 
         parser = Parser(scanner)
-        tree = parser.parse()
+        program = parser.parse()
+
+        tree_to_json = TreeToJson()
+        obj = program.accept(tree_to_json)
+        print(obj)
 
         # print("#####     PARSE TREE     #####")
-        for statement in tree:
-            print(statement)
+        # for statement in tree:
+        #     print(statement)
 
         # print("##### PRESS ENTER TO RUN #####")
         # input()
@@ -32,18 +36,18 @@ class Compiler:
         logger.ACTIVE = True
         logger.DEBUG = False
 
-        prog = []
+        # prog = []
+        #
+        # for node in tree:
+        #     # print("NODE before: ", node)
+        #     node = make_ast_node(node)
+        #     # print("NODE after: ", node)
+        #     prog.append(node)
+        #     # print(node)
 
-        for node in tree:
-            # print("NODE before: ", node)
-            node = make_ast_node(node)
-            # print("NODE after: ", node)
-            prog.append(node)
-            # print(node)
-
-        scope_analyzer = ScopeAnalyzer()
-
-        ir = scope_analyzer.analyze(prog)
+        # scope_analyzer = ScopeAnalyzer()
+        #
+        # ir = scope_analyzer.analyze(prog)
 
         # translator = FromOpToProcCall()
         # ir = translator.translate(prog)
@@ -51,4 +55,4 @@ class Compiler:
         # translator = ExtractArgsToVar(ir)
         # ir = translator.translate(ir)
 
-        return ir
+        # return ir

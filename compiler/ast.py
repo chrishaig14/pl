@@ -1,41 +1,29 @@
-from colorama import Fore, Back
-import copy
+class Program:
+    def __init__(self, statements):
+        self.statements = statements
 
-counter = 0
+    # self.statements = [make_ast_node(s) for s in node["statements"]]
 
+    def accept(self, visitor):
+        return visitor.visit_program(self)
 
-def make_ast_node(node):
-    if node is None:
-        return None
-    if node["type"] == "Declaration":
-        return Declaration(node)
-    if node["type"] == "Assignment":
-        return Assignment(node)
-    if node["type"] == "Expression":
-        return Expression(node)
-    if node["type"] == "Variable":
-        return Variable(node)
-    if node["type"] == "Number":
-        return Number(node)
-    if node["type"] == "String":
-        return String(node)
-    if node["type"] == "FunctionCall":
-        return FunctionCall(node)
-    if node["type"] == "Return":
-        return Return(node)
-    if node["type"] == "Function":
-        return Function(node)
-    if node["type"] == "If":
-        return If(node)
-    if node["type"] == "Block":
-        return Block(node)
-    if node["type"] == "Array":
-        return Array(node)
+    def to_json(self):
+        json = {}
+        json["type"] = "program"
+        json["statements"] = []
+        for s in self.statements:
+            json["statements"].append(s.to_json())
+        return json
+
+    def __repr__(self):
+        return str(self.to_json())
 
 
 class Array:
-    def __init__(self, node):
-        self.values = [make_ast_node(s) for s in node["values"]]
+    def __init__(self, values):
+        self.values = values
+
+    # self.values = [make_ast_node(s) for s in node["values"]]
 
     def accept(self, visitor):
         return visitor.visit_array(self)
@@ -51,8 +39,10 @@ class Array:
 
 
 class Block:
-    def __init__(self, node):
-        self.statements = [make_ast_node(s) for s in node["statements"]]
+    def __init__(self, statements):
+        self.statements = statements
+
+    # self.statements = [make_ast_node(s) for s in node["statements"]]
 
     def accept(self, visitor):
         return visitor.visit_block(self)
@@ -70,9 +60,12 @@ class Block:
 
 
 class If:
-    def __init__(self, node):
-        self.cond = make_ast_node(node["cond"])
-        self.then = make_ast_node(node["then"])
+    def __init__(self, cond, then):
+        self.then = then
+        self.cond = cond
+
+    # self.cond = make_ast_node(node["cond"])
+    # self.then = make_ast_node(node["then"])
 
     def accept(self, visitor):
         return visitor.visit_if(self)
@@ -88,13 +81,16 @@ class If:
 
 
 class FunctionCall:
-    def __init__(self, node=None):
-        if node is not None:
-            self.id = node["id"]
-            self.args = [make_ast_node(arg) for arg in node["args"]]
-        else:
-            self.id = ""
-            self.args = []
+    def __init__(self, id, args):
+        self.args = args
+        self.id = id
+
+    # if node is not None:
+    #     self.id = node["id"]
+    #     self.args = [make_ast_node(arg) for arg in node["args"]]
+    # else:
+    #     self.id = ""
+    #     self.args = []
 
     def accept(self, visitor):
         return visitor.visit_function_call(self)
@@ -113,10 +109,14 @@ class FunctionCall:
 
 
 class Expression:
-    def __init__(self, node):
-        self.first = make_ast_node(node["first"])
-        self.second = make_ast_node(node["second"])
-        self.op = node["op"]
+    def __init__(self, first, op, second):
+        self.first = first
+        self.op = op
+        self.second = second
+
+    # self.first = make_ast_node(node["first"])
+    # self.second = make_ast_node(node["second"])
+    # self.op = node["op"]
 
     def accept(self, visitor):
         return visitor.visit_expression(self)
@@ -133,9 +133,12 @@ class Expression:
 
 
 class Declaration:
-    def __init__(self, node):
-        self.id = node["id"]
-        self.init = make_ast_node(node["init"])
+    def __init__(self, id, init):
+        self.init = init
+        self.id = id
+
+    # self.id = node["id"]
+    # self.init = make_ast_node(node["init"])
 
     def accept(self, visitor):
         return visitor.visit_declaration(self)
@@ -155,8 +158,10 @@ class Declaration:
 
 
 class String:
-    def __init__(self, node):
-        self.string = node["value"]
+    def __init__(self, value):
+        self.value = value
+
+    # self.string = node["value"]
 
     def accept(self, visitor):
         return self.string
@@ -172,9 +177,12 @@ class String:
 
 
 class Function:
-    def __init__(self, node):
-        self.params = [par["data"] for par in node["params"]]
-        self.statements = make_ast_node(node["statements"])
+    def __init__(self, params, statements):
+        self.statements = statements
+        self.params = params
+
+    # self.params = [par["data"] for par in node["params"]]
+    # self.statements = make_ast_node(node["statements"])
 
     def accept(self, visitor):
         return visitor.visit_function(self)
@@ -191,8 +199,10 @@ class Function:
 
 
 class Return:
-    def __init__(self, node):
-        self.exp = make_ast_node(node["exp"])
+    def __init__(self, exp):
+        self.exp = exp
+
+    # self.exp = make_ast_node(node["exp"])
 
     def accept(self, visitor):
         return visitor.visit_return(self)
@@ -208,8 +218,10 @@ class Return:
 
 
 class Variable:
-    def __init__(self, node):
-        self.id = node["id"]
+    def __init__(self, id):
+        self.id = id
+
+    # self.id = node["id"]
 
     def accept(self, visitor):
         return visitor.visit_variable(self)
@@ -225,8 +237,10 @@ class Variable:
 
 
 class Number:
-    def __init__(self, node):
-        self.number = node["value"]
+    def __init__(self, number):
+        self.number = number
+
+    # self.number = node["value"]
 
     def accept(self, visitor):
         return visitor.visit_number(self)
@@ -242,9 +256,12 @@ class Number:
 
 
 class Assignment:
-    def __init__(self, node):
-        self.lvalue = make_ast_node(node["lvalue"])
-        self.rvalue = make_ast_node(node["rvalue"])
+    def __init__(self, lvalue, rvalue):
+        self.rvalue = rvalue
+        self.lvalue = lvalue
+
+    # self.lvalue = make_ast_node(node["lvalue"])
+    # self.rvalue = make_ast_node(node["rvalue"])
 
     def accept(self, visitor):
         return visitor.visit_assignment(self)

@@ -29,12 +29,12 @@ source = source.read()
 print("SOURCE IS: ", source)
 
 compiler = Compiler()
-prog = compiler.compile(source)
+compiler.compile(source)
 
-print("FINAL:")
-
-for x in prog:
-    print(x)
+# print("FINAL:")
+#
+# for x in prog:
+#     print(x)
 
 # runtime = Runtime()
 # runtime.run(prog)

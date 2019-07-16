@@ -1,5 +1,8 @@
 from colorama import Fore, Back, Style
 
+from compiler.ast import Expression, Declaration, Assignment, Function, String, Number, Array, FunctionCall, Variable, \
+    If, Return, Block, Program
+
 
 class Parser:
     def __init__(self, scanner):
@@ -13,9 +16,10 @@ class Parser:
 
         if self.match("assign"):
             rvalue = self.parse_expression()
-            print("rvalue:", rvalue)
-            input()
-            return {"type": "Assignment", "lvalue": lvalue, "rvalue": rvalue}
+            # print("rvalue:", rvalue)
+            # input()
+            # return {"type": "Assignment", "lvalue": lvalue, "rvalue": rvalue}
+            return Assignment(lvalue, rvalue)
         else:
             return lvalue
 
@@ -29,7 +33,8 @@ class Parser:
             if self.check("assign"):
                 self.advance()
                 exp = self.parse_expression()
-            return {"type": "Declaration", "id": id, "init": exp}
+            # return {"type": "Declaration", "id": id, "init": exp}
+            return Declaration(id, exp)
 
     def parse_expression(self):
         exp = self.parse_math_exp()
@@ -38,9 +43,10 @@ class Parser:
             op = self.current_token["type"]
             self.advance()
             second = self.parse_math_exp()
-            print("second: ", second)
-            exp = {"type": "Expression", "first": exp,
-                   "op": op, "second": second}
+            # print("second: ", second)
+            # exp = {"type": "Expression", "first": exp,
+            # "op": op, "second": second}
+            exp = Expression(exp, op, second)
 
         return exp
 
@@ -51,10 +57,10 @@ class Parser:
             op = self.current_token["type"]
             self.advance()
             second = self.parse_term()
-            print("second: ", second)
-            exp = {"type": "Expression", "first": exp,
-                   "op": op, "second": second}
-
+            # print("second: ", second)
+            # exp = {"type": "Expression", "first": exp,
+            #        "op": op, "second": second}
+            exp = Expression(exp, op, second)
         return exp
 
     def parse_term(self):
@@ -66,11 +72,13 @@ class Parser:
             if self.check('mult'):
                 self.advance()
                 term = self.parse_term()
-                return {"type": "Expression", "first": factor, "op": 'mult', "second": term}
+                # return {"type": "Expression", "first": factor, "op": 'mult', "second": term}
+                return Expression(factor, 'mult', term)
             if self.check('div'):
                 self.advance()
                 term = self.parse_term()
-                return {"type": "Expression", "first": factor, "op": 'div', "second": term}
+                # return {"type": "Expression", "first": factor, "op": 'div', "second": term}
+                return Expression(factor, 'div', term)
             return factor
 
     def parse_function(self):
@@ -94,27 +102,31 @@ class Parser:
         # self.advance()
         statements = self.parse_block()
 
-        return {"type": "Function", "params": params, "statements": statements}
+        # return {"type": "Function", "params": params, "statements": statements}
+        return Function(params, statements)
 
     def parse_factor(self):
         # factor => number
 
         if self.match('string'):
-            return {"type": "String", "value": self.previous_token["data"][1:-1]}
+            # return {"type": "String", "value": self.previous_token["data"][1:-1]}
+            return String(self.previous_token["data"[1:-1]])
         if self.match('number'):
-            return {"type": "Number", "value": self.previous_token["data"]}
+            # return {"type": "Number", "value": self.previous_token["data"]}
+            return Number(self.previous_token["data"])
         if self.match("lsquare"):
             values = []
             while values == [] or self.check("comma"):
                 if self.check("comma"):
                     self.advance()
                 val = self.parse_expression()
-                print("VAL: ", val)
+                # print("VAL: ", val)
                 # self.check("comma")
                 values.append(val)
             self.expect("rsquare")
-            print("ARRAY VALUES: ", values)
-            return {"type":"Array", "values": values}
+            # print("ARRAY VALUES: ", values)
+            # return {"type": "Array", "values": values}
+            return Array(values)
         # factor => id
         if self.match("id"):
 
@@ -123,7 +135,8 @@ class Parser:
             if self.match("lparen"):
                 if self.match("rparen"):
 
-                    return {"type": "FunctionCall", "id": id, "args": []}
+                    # return {"type": "FunctionCall", "id": id, "args": []}
+                    return FunctionCall(id, [])
                 else:
                     arg = self.parse_expression()
 
@@ -133,10 +146,12 @@ class Parser:
                         args.append(arg)
 
                     self.match("rparen")
-                    return {"type": "FunctionCall", "id": id, "args": args}
+                    # return {"type": "FunctionCall", "id": id, "args": args}
+                    return FunctionCall(id, args)
             else:
 
-                return {"type": "Variable", "id": id}
+                # return {"type": "Variable", "id": id}
+                return Variable(id)
 
         # factor => ( exp )
         if self.match("lparen"):
@@ -146,7 +161,7 @@ class Parser:
                 return exp
         if self.match("fun"):
             fun = self.parse_function()
-            print("FUNCTION: ", fun)
+            # print("FUNCTION: ", fun)
             return fun
 
     def parse_block(self):
@@ -157,7 +172,8 @@ class Parser:
             statements.append(statement)
 
         self.advance()
-        return {"type": "Block", "statements": statements}
+        # return {"type": "Block", "statements": statements}
+        return Block(statements)
 
     def parse_if(self):
         if self.check("if"):
@@ -170,8 +186,9 @@ class Parser:
             then = self.parse_block()
             # self.expect("rbrace")
             node = {"type": "If", "cond": exp, "then": then}
-            print("IF NODE: ", node)
-            return node
+            # print("IF NODE: ", node)
+            # return node
+            return If(exp, then)
 
     def parse_statement(self):
         # print("parsing statement")
@@ -196,7 +213,8 @@ class Parser:
             exp = self.parse_expression()
 
             self.expect("semicolon")
-            return {"type": "Return", "exp": exp}
+            # return {"type": "Return", "exp": exp}
+            return Return(exp)
         if self.check("if"):
             ifst = self.parse_if()
             return ifst
@@ -232,7 +250,8 @@ class Parser:
         while not self.check("eof"):
             statement = self.parse_statement()
             program.append(statement)
-        return program
+        # return program
+        return Program(program)
 
     def parse(self):
         self.current_token = self.scanner.get_next()
