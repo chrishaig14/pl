@@ -86,10 +86,10 @@ class Parser:
         self.expect("lparen")
         params = []
         if self.match("id"):
-            params.append(self.previous_token)
+            params.append(self.previous_token["data"])
             while self.match("comma"):
                 self.expect("id")
-                params.append(self.previous_token)
+                params.append(self.previous_token["data"])  ### send only id
 
         self.expect("rparen")
 

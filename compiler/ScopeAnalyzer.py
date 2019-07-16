@@ -50,13 +50,15 @@ class ScopeAnalyzer:
     def __init__(self):
         self.scope = Scope()
 
-    def analyze(self, tree):
-        all = []
-        for node in tree:
-            c = node.accept(self)
-            all.append(c)
-        print(all)
-        return all
+    def visit_program(self, program):
+        for st in program.statements:
+            st.accept(self)
+        # all = []
+        # for node in tree:
+        #     c = node.accept(self)
+        #     all.append(c)
+        # print(all)
+        # return all
 
     def visit_block(self, block):
         print("VISITING BLOCK")
@@ -76,7 +78,7 @@ class ScopeAnalyzer:
     def visit_variable(self, variable):
         if not self.scope.get(variable.id):
             print("ERROR: ", variable.id, "not defined in scope")
-            exit(1)
+            # exit(1)
         return NodeWithScope(variable, self.scope)
 
     def visit_function(self, function):
@@ -116,11 +118,14 @@ class ScopeAnalyzer:
         return NodeWithScope(declaration, parent_scope)
 
     def visit_if(self, ifst):
+        print("VISITING IF")
         ifst.cond = ifst.cond.accept(self)
         ifst.then = ifst.then.accept(self)
         return NodeWithScope(ifst, self.scope)
 
     def visit_return(self, return_s):
+        print("VISITING RETURN")
+        return_s.exp = return_s.exp.accept(self)
         return NodeWithScope(return_s, self.scope)
 
     def visit_expression(self, expression):
