@@ -7,16 +7,16 @@ class Program:
     def accept(self, visitor):
         return visitor.visit_program(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "program"
-        json["statements"] = []
-        for s in self.statements:
-            json["statements"].append(s.to_json())
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "program"
+    #     json["statements"] = []
+    #     for s in self.statements:
+    #         json["statements"].append(s.to_json())
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Array:
@@ -28,14 +28,14 @@ class Array:
     def accept(self, visitor):
         return visitor.visit_array(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "array"
-        json["values"] = [s.to_json() for s in self.values]
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "array"
+    #     json["values"] = [s.to_json() for s in self.values]
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Block:
@@ -47,16 +47,16 @@ class Block:
     def accept(self, visitor):
         return visitor.visit_block(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "block"
-        json["statements"] = []
-        for s in self.statements:
-            json["statements"].append(s.to_json())
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "block"
+    #     json["statements"] = []
+    #     for s in self.statements:
+    #         json["statements"].append(s.to_json())
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class If:
@@ -70,14 +70,14 @@ class If:
     def accept(self, visitor):
         return visitor.visit_if(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "if"
-        json["then"] = self.then.to_json()
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "if"
+    #     json["then"] = self.then.to_json()
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class FunctionCall:
@@ -95,17 +95,17 @@ class FunctionCall:
     def accept(self, visitor):
         return visitor.visit_function_call(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "function_call"
-        json["args"] = []
-
-        for arg in self.args:
-            json["args"].append(arg.to_json())
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "function_call"
+    #     json["args"] = []
+    #
+    #     for arg in self.args:
+    #         json["args"].append(arg.to_json())
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Expression:
@@ -121,15 +121,15 @@ class Expression:
     def accept(self, visitor):
         return visitor.visit_expression(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "expression"
-        json["first"] = self.first.to_json()
-        json["second"] = self.second.to_json()
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "expression"
+    #     json["first"] = self.first.to_json()
+    #     json["second"] = self.second.to_json()
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Declaration:
@@ -142,19 +142,19 @@ class Declaration:
 
     def accept(self, visitor):
         return visitor.visit_declaration(self)
-
-    def to_json(self):
-        json = {}
-        json["type"] = "declaration"
-        json["id"] = self.id
-        if self.init is not None:
-            json["init"] = self.init.to_json()
-        else:
-            json["init"] = None
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    #
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "declaration"
+    #     json["id"] = self.id
+    #     if self.init is not None:
+    #         json["init"] = self.init.to_json()
+    #     else:
+    #         json["init"] = None
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class String:
@@ -166,14 +166,14 @@ class String:
     def accept(self, visitor):
         return self.string
 
-    def to_json(self):
-        json = {}
-        json["type"] = "string"
-        json["value"] = self.string
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "string"
+    #     json["value"] = self.string
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Function:
@@ -187,15 +187,15 @@ class Function:
     def accept(self, visitor):
         return visitor.visit_function(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "function"
-        json["params"] = self.params
-        json["statements"] = [s.to_json() for s in self.statements]
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "function"
+    #     json["params"] = self.params
+    #     json["statements"] = [s.to_json() for s in self.statements]
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Return:
@@ -207,14 +207,14 @@ class Return:
     def accept(self, visitor):
         return visitor.visit_return(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "return"
-        json["exp"] = self.exp.to_json()
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "return"
+    #     json["exp"] = self.exp.to_json()
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Variable:
@@ -225,15 +225,15 @@ class Variable:
 
     def accept(self, visitor):
         return visitor.visit_variable(self)
-
-    def to_json(self):
-        json = {}
-        json["type"] = "variable"
-        json["id"] = self.id
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    #
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "variable"
+    #     json["id"] = self.id
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Number:
@@ -245,14 +245,14 @@ class Number:
     def accept(self, visitor):
         return visitor.visit_number(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "number"
-        json["value"] = self.number
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "number"
+    #     json["value"] = self.number
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
 
 
 class Assignment:
@@ -266,12 +266,12 @@ class Assignment:
     def accept(self, visitor):
         return visitor.visit_assignment(self)
 
-    def to_json(self):
-        json = {}
-        json["type"] = "assignment"
-        json["id"] = self.lvalue
-        json["exp"] = self.rvalue.to_json()
-        return json
-
-    def __repr__(self):
-        return str(self.to_json())
+    # def to_json(self):
+    #     json = {}
+    #     json["type"] = "assignment"
+    #     json["id"] = self.lvalue
+    #     json["exp"] = self.rvalue.to_json()
+    #     return json
+    #
+    # def __repr__(self):
+    #     return str(self.to_json())
