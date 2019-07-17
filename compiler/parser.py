@@ -110,21 +110,22 @@ class Parser:
 
         if self.match('string'):
             # return {"type": "String", "value": self.previous_token["data"][1:-1]}
-            return String(self.previous_token["data"[1:-1]])
+            return String(self.previous_token["data"][1:-1])
         if self.match('number'):
             # return {"type": "Number", "value": self.previous_token["data"]}
             return Number(self.previous_token["data"])
         if self.match("lsquare"):
+            print("PARSING ARRAY")
             values = []
             while values == [] or self.check("comma"):
                 if self.check("comma"):
                     self.advance()
                 val = self.parse_expression()
-                # print("VAL: ", val)
+                print("VAL: ", val)
                 # self.check("comma")
                 values.append(val)
             self.expect("rsquare")
-            # print("ARRAY VALUES: ", values)
+            print("ARRAY VALUES: ", values)
             # return {"type": "Array", "values": values}
             return Array(values)
         # factor => id

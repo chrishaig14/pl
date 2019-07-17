@@ -25,7 +25,7 @@ class TreeToJson:
     def visit_array(self, array):
         obj = {}
         obj["type"] = "array"
-        obj["values"] = [st.accept(self) for st in array.statements]
+        obj["values"] = [st.accept(self) for st in array.values]
         return obj
         # pass
 
@@ -64,6 +64,12 @@ class TreeToJson:
         obj["type"] = "number"
         obj["number"] = number.number
         return obj
+    def visit_string(self, string):
+        obj = {}
+        obj["type"] = "string"
+        obj["string"] = string.value
+        return obj
+
         # return "NUMBER " + str(number.number)
 
     def visit_declaration(self, declaration):

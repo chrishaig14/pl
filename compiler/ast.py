@@ -64,7 +64,7 @@ class String:
         self.value = value
 
     def accept(self, visitor):
-        return self.string
+        return visitor.visit_string(self)
 
 
 class Function:

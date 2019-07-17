@@ -37,7 +37,19 @@ class Generator:
         return code
 
     def visit_array(self, array):
-        return []
+        code = []
+        values = []
+        for val in array.values:
+            code += val.accept(self)
+            value_var = add_result(code)
+            values += [value_var]
+        string = "["
+        for value in values:
+            string += value + ","
+        string = string[:-1]
+        string += "]"
+        code += [string]
+        return code
 
     def visit_variable(self, variable):
         return variable.id
@@ -69,6 +81,9 @@ class Generator:
 
     def visit_number(self, number):
         return str(number.number)
+
+    def visit_string(self, string):
+        return ["'" + string.value + "'"]
 
     def visit_declaration(self, declaration):
         print("VISITING DECLARATION")

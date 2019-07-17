@@ -1,7 +1,2 @@
-var factorial = fun(n) {
-	if (n == 0){
-		return 0;
-	}
-	return n*factorial(n-1);
-};
-print(factorial(5));
+var x = [1,2,3,"HOLA"];
+print(x);
