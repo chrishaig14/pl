@@ -61,10 +61,9 @@ class Generator:
         arg_vars = []
         for arg in function_call.args:
             arg = arg.accept(self)
-            arg_var = new_var()
-            arg_vars.append(arg_var)
             code += arg
-            code[-1] = arg_var + " = " + code[-1]
+            arg_var = add_result(code)
+            arg_vars.append(arg_var)
         code += ["CALL " + function_call.id + " " + self.to_string(arg_vars)]
         return code
 
@@ -101,29 +100,17 @@ class Generator:
         code = []
         code += expression.first.accept(self)
 
-        # last = code[-1]
-        # first_var = new_var()
-        # code[-1] = "DECLARE " + first_var
-        # code.append("")
-        # code[-1] = first_var + " = " + last
-
         first_var = add_result(code)
 
         code += expression.second.accept(self)
 
-        # last = code[-1]
-        # second_var = new_var()
-        # code[-1] = "DECLARE " + second_var
-        # code.append("")
-        # code[-1] = second_var + " = " + last
-
         second_var = add_result(code)
 
-        # second_var = new_var()
-        # code[-1] = second_var + " = " + code[-1]
         code.append(first_var + " " + expression.op + " " + second_var)
         return code
 
     def visit_assignment(self, assignment):
-        assignment.rvalue = assignment.rvalue.accept(self)
-        return NodeWithScope(assignment, self.scope)
+        code = assignment.rvalue.accept(self)
+        rvalue = add_result(code)
+        code += [assignment.lvalue.accept(self) + " = " + rvalue]
+        return code
