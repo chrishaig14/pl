@@ -91,8 +91,8 @@ class Generator:
         print("VISITING RETURN")
         code = []
         code += return_s.exp.accept(self)
-        return_var = new_var()
-        code[-1] = return_var + " = " + code[-1]
+        # return_var = new_var()
+        return_var = add_result(code)
         code += ["RETURN " + return_var]
         return code
 

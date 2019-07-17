@@ -1,13 +1,7 @@
-var y;
-var x = y + 7;
-var k = 1;
-var sum = fun(z){
-	var w;
-	if (w == 7){
-		
-		return x + w;
+var factorial = fun(n) {
+	if (n == 0){
+		return 0;
 	}
-	return suma(z-1, sum(8,w+2)) + z;
+	return n*factorial(n-1);
 };
-var wawa = k + 1;
-y = k + 2*sum(9,a);
+print(factorial(5));
