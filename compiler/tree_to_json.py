@@ -1,6 +1,4 @@
 class TreeToJson:
-    def __init__(self):
-        pass
 
     def visit_program(self, program):
         obj = {}
@@ -13,32 +11,20 @@ class TreeToJson:
         obj["type"] = "block"
         obj["statements"] = [st.accept(self) for st in block.statements]
         return obj
-        # print("VISITING BLOCK")
-        # all = []
-        # for statement in block.statements:
-        #     c = statement.accept(self)
-        #     all.append(c)
-        # block.statements = all
-        # print("BLOCK IS:", block)
-        # return block
 
     def visit_array(self, array):
         obj = {}
         obj["type"] = "array"
         obj["values"] = [st.accept(self) for st in array.values]
         return obj
-        # pass
 
     def visit_variable(self, variable):
         obj = {}
         obj["type"] = "variable"
         obj["id"] = variable.id
         return obj
-        # return variable.id
 
     def visit_function(self, function):
-        # function.statements = function.statements.accept(self)
-        # return function
         obj = {}
         obj["type"] = "function"
         obj["params"] = function.params
@@ -46,13 +32,6 @@ class TreeToJson:
         return obj
 
     def visit_function_call(self, function_call):
-        # print("VISITING FUNCTION CALL")
-        # all = []
-        # for arg in function_call.args:
-        #     a = arg.accept(self)
-        #     all.append(a)
-        # function_call.args = all
-        # return function_call
         obj = {}
         obj["type"] = "function call"
         obj["id"] = function_call.id
@@ -70,14 +49,7 @@ class TreeToJson:
         obj["string"] = string.value
         return obj
 
-        # return "NUMBER " + str(number.number)
-
     def visit_declaration(self, declaration):
-        # print("VISITING DECLARATION")
-        # if declaration.init:
-        #     c = declaration.init.accept(self)
-        #     declaration.init = c
-        # return declaration
         obj = {}
         obj["type"] = "declaration"
         obj["id"] = declaration.id
@@ -91,30 +63,14 @@ class TreeToJson:
         obj["cond"] = ifst.cond.accept(self)
         obj["then"] = ifst.then.accept(self)
         return obj
-        # pass
 
     def visit_return(self, return_s):
         obj = {}
         obj["type"] = "return"
         obj["exp"] = return_s.exp.accept(self)
         return obj
-        # exp = return_s.exp.accept(self)
-        # return_s.exp = exp
-        # return return_s
 
     def visit_expression(self, expression):
-        # print("VISITING EXPRESSION  ")
-        # fun_id = ""
-        # if expression.op == "plus":
-        #     fun_id = "sum"
-        # if expression.op == "minus":
-        #     fun_id = "sub"
-        # fc = FunctionCall(None)
-        # fc.id = fun_id
-        # f = expression.first.accept(self)
-        # s = expression.second.accept(self)
-        # fc.args = [f, s]
-        # return fc
         obj = {}
         obj["type"] = "expression"
         obj["first"] = expression.first.accept(self)
