@@ -1,5 +1,8 @@
+import copy
+
 from compiler import logger
 from compiler.ScopeAnalyzer import ScopeAnalyzer
+from compiler.generator import Generator
 from compiler.parser import Parser
 from compiler.scanner import Scanner
 from compiler.tree_to_json import TreeToJson
@@ -26,4 +29,12 @@ class Compiler:
         logger.DEBUG = False
 
         scope_analyzer = ScopeAnalyzer()
-        program.accept(scope_analyzer)
+
+        program_copy = copy.deepcopy(program)
+
+        program_copy.accept(scope_analyzer)
+
+        generator = Generator()
+        code = program.accept(generator)
+
+        return code
