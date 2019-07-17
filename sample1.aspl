@@ -1,2 +1,6 @@
-var x = [1,2,3,"HOLA"];
-print(x);
+var suma = fun(a,b){
+	return a + b;
+};
+var a = 9;
+var b = 5;
+var x = suma(a,b);

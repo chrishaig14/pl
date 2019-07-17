@@ -3,6 +3,7 @@ import copy
 from compiler import logger
 from compiler.ScopeAnalyzer import ScopeAnalyzer
 from compiler.generator import Generator
+from compiler.linear_generator import LinearGenerator
 from compiler.parser import Parser
 from compiler.scanner import Scanner
 from compiler.tree_to_json import TreeToJson
@@ -34,7 +35,10 @@ class Compiler:
 
         program_copy.accept(scope_analyzer)
 
-        generator = Generator()
-        code = program.accept(generator)
+        # generator = Generator()
+        # code = program.accept(generator)
+
+        linear_generator = LinearGenerator()
+        code = program.accept(linear_generator)
 
         return code
