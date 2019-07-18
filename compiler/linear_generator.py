@@ -30,7 +30,7 @@ class LinearGenerator:
         return code
 
     def visit_block(self, block):
-        print("############ VISITING BLOCK IN GENERATOR")
+        print("VISITING BLOCK IN GENERATOR")
 
         code = []
         for st in block.statements:
@@ -57,7 +57,6 @@ class LinearGenerator:
 
     def visit_function(self, function):
         print("VISITING FUNCTION")
-        # code = ["FUNCTION " + str(function.statements.accept(self))]
         code = [FunctionI(function.params, function.statements.accept(self))]
         return code
 
@@ -78,7 +77,6 @@ class LinearGenerator:
             code += arg
             arg_var = add_result(code)
             arg_vars.append(arg_var)
-        # code += ["CALL " + function_call.id + " " + self.to_string(arg_vars)]
         code += [FunctionCallI(function_call.id, arg_vars)]
         code += [VariableI("__return__")]
         return code
@@ -97,7 +95,6 @@ class LinearGenerator:
         if declaration.init is not None:
             code += declaration.init.accept(self)
             code[-1] = AssignI(declaration.id, code[-1])
-            # code[-1] = declaration.id + " = " + code[-1]
         return code
 
     def visit_if(self, ifst):
@@ -112,7 +109,6 @@ class LinearGenerator:
         print("VISITING RETURN")
         code = []
         code += return_s.exp.accept(self)
-        # return_var = new_var()
         return_var = add_result(code)
         code += [ReturnI(return_var)]
         return code

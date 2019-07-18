@@ -92,9 +92,7 @@ class Runtime:
         self.env.define(declareI.name)
 
     def visit_AssignI(self, assignI):
-        # print("ATOM:", assignI.atom)
         value = assignI.atom.accept(self)
-        # print("VALUE: ", value)
         self.env.assign(assignI.name, value)
 
     def visit_FunctionI(self, functionI):
@@ -107,24 +105,15 @@ class Runtime:
     def visit_VariableI(self, variableI):
 
         value = self.env.get(variableI.name)
-        print("GETTING VARIABLE :", variableI.name, " = ", value)
         return value
 
     def visit_functionCallI(self, functionCall):
-        print("EXECUTING FUNCTION CALL")
         proc_val = self.env.get(functionCall.name)
         if proc_val.builtin:
-            print("EXECUTING BUILTIN FUNCTION CALL")
-            print("FUNCTION ARGUMENTS: ", functionCall.args)
-            print("FUNCTION ARGUMENTS: ", self.env)
-            print("FUNCTION ARGUMENTS: ", self.store)
             arguments = [self.env.get(arg) for arg in functionCall.args]
-            print("ARGUMENTS FOR BUILTIN: ", arguments)
             val = proc_val.body(arguments)
-            print("RETURNING FROM BUILTIN FUNCTION CALL: ", val)
             self.env.assign("__return__", val)
             return val
-        print("EXECUTING FUNCTION CALL")
         args_val = [self.env.get(arg) for arg in functionCall.args]
         env = proc_val.closure.copy()
         for i, param in enumerate(proc_val.params):
@@ -134,13 +123,9 @@ class Runtime:
         self.env = env
         self.stack.enter()
         proc_val.body.accept(self)
-        print("ENV: ", env)
-        print("ENV: ", original_env)
-        print("STORE:", self.store)
         self.env = original_env
 
         returnvalue = self.env.get("__return__")
-        print("2 ) ???????????? IN FUNCTIONCALLI RETURNING VALUE: ", returnvalue)
         return returnvalue
 
     def visit_BlockI(self, blockI):
@@ -153,9 +138,7 @@ class Runtime:
 
     def visit_ReturnI(self, returnI):
         value = self.env.get(returnI.name)
-        print("RETURNING FROM FUNCTION: ", returnI.name, "=", value)
         self.env.assign("__return__", value)
-        print("1) RETURN IS:", self.env.get("__return__"))
         self.stack.leave()
 
     def run(self, prog):

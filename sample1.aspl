@@ -1,7 +1,12 @@
 var suma = fun(a,b){
 	return a + b;
 };
+var s = fun(a){
+	return suma(4,a);
+}
 var a = 9;
 var b = 5;
 var x = suma(a,b);
-print(x);
+var y = s(3);
+print(y);
+print(sum(90,11));
