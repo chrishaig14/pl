@@ -21,7 +21,7 @@ class TreeToJson:
     def visit_variable(self, variable):
         obj = {}
         obj["type"] = "variable"
-        obj["id"] = variable.id
+        obj["name"] = variable.name
         return obj
 
     def visit_function(self, function):

@@ -91,8 +91,8 @@ class Return:
 
 
 class Variable:
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, name):
+        self.name = name
 
     def accept(self, visitor):
         return visitor.visit_variable(self)

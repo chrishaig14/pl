@@ -53,7 +53,7 @@ class LinearGenerator:
         return code
 
     def visit_variable(self, variable):
-        return [VariableI(variable.id)]
+        return [VariableI(variable.name)]
 
     def visit_function(self, function):
         print("VISITING FUNCTION")
@@ -135,5 +135,6 @@ class LinearGenerator:
     def visit_assignment(self, assignment):
         code = assignment.rvalue.accept(self)
         rvalue = add_result(code)
-        code += [assignment.lvalue.accept(self) + " = " + rvalue]
+        lvalue = assignment.lvalue.accept(self)
+        code += [AssignI(assignment.lvalue.name, VariableI(rvalue))]
         return code

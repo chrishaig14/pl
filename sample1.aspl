@@ -1,12 +1,12 @@
-var suma = fun(a,b){
-	return a + b;
+var a = 5;
+var n = 7;
+var s = fun(n){
+	var a;
+	a = 10;
+	print(a);
+	print(n+5);
 };
-var s = fun(a){
-	return suma(4,a);
-}
-var a = 9;
-var b = 5;
-var x = suma(a,b);
-var y = s(3);
-print(y);
-print(sum(90,11));
+s(9);
+print(a);
+print(n);
+s(1);

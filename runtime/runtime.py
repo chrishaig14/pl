@@ -92,6 +92,7 @@ class Runtime:
         self.env.define(declareI.name)
 
     def visit_AssignI(self, assignI):
+        # print("ATOM: ", type(assignI.atom))
         value = assignI.atom.accept(self)
         self.env.assign(assignI.name, value)
 

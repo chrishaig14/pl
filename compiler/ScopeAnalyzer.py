@@ -76,8 +76,8 @@ class ScopeAnalyzer:
         return NodeWithScope(array, self.scope)
 
     def visit_variable(self, variable):
-        if not self.scope.get(variable.id):
-            print("ERROR: ", variable.id, "not defined in scope")
+        if not self.scope.get(variable.name):
+            print("ERROR: ", variable.name, "not defined in scope")
             # exit(1)
         return NodeWithScope(variable, self.scope)
 
