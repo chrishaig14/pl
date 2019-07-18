@@ -10,7 +10,6 @@ class NodeWithScope:
         json = {}
         json["node"] = self.node.to_json()
         json["scope"] = self.scope.to_json()
-        # return "<" + str(self.node) + "," + str(self.scope) + ">"
         return json
 
     def __repr__(self):
@@ -53,12 +52,6 @@ class ScopeAnalyzer:
     def visit_program(self, program):
         for st in program.statements:
             st.accept(self)
-        # all = []
-        # for node in tree:
-        #     c = node.accept(self)
-        #     all.append(c)
-        # print(all)
-        # return all
 
     def visit_block(self, block):
         print("VISITING BLOCK")
@@ -78,7 +71,7 @@ class ScopeAnalyzer:
     def visit_variable(self, variable):
         if not self.scope.get(variable.name):
             print("ERROR: ", variable.name, "not defined in scope")
-            # exit(1)
+            exit(1)
         return NodeWithScope(variable, self.scope)
 
     def visit_function(self, function):
