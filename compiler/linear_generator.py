@@ -1,5 +1,7 @@
 import copy
 
+from compiler.linear_instructions import *
+
 counter = 0
 
 
@@ -8,78 +10,6 @@ def new_var():
     name = "aux" + str(counter)
     counter += 1
     return name
-
-
-class CodeI:
-    def __repr__(self):
-        return str(self)
-
-
-class DeclareI(CodeI):
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return "DECLARE " + self.name
-
-
-class AssignI(CodeI):
-    def __init__(self, name, atom):
-        self.name = name
-        self.atom = atom
-
-    def __str__(self):
-        return "ASSIGN " + self.name + " " + str(self.atom)
-
-
-class NumberI(CodeI):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
-
-
-class StringI(CodeI):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
-
-
-class FunctionCallI(CodeI):
-    def __init__(self, name, args):
-        self.args = args
-        self.name = name
-
-    def __str__(self):
-        return "CALL " + self.name + str(self.args)
-
-
-class VariableI(CodeI):
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return self.name
-
-
-class ReturnI(CodeI):
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return "RETURN " + self.name
-
-
-class FunctionI(CodeI):
-    def __init__(self, params, statements):
-        self.params = params
-        self.statements = statements
-
-    def __str__(self):
-        return "FUNCTION " + str(self.params) + " " + str(self.statements)
 
 
 def add_result(code):
@@ -100,12 +30,12 @@ class LinearGenerator:
         return code
 
     def visit_block(self, block):
-        print("VISITING BLOCK")
+        print("############ VISITING BLOCK IN GENERATOR")
 
         code = []
         for st in block.statements:
             code += st.accept(self)
-        return code
+        return BlockI(code)
 
     def visit_array(self, array):
         code = []
@@ -123,7 +53,7 @@ class LinearGenerator:
         return code
 
     def visit_variable(self, variable):
-        return variable.id
+        return [VariableI(variable.id)]
 
     def visit_function(self, function):
         print("VISITING FUNCTION")
@@ -150,13 +80,15 @@ class LinearGenerator:
             arg_vars.append(arg_var)
         # code += ["CALL " + function_call.id + " " + self.to_string(arg_vars)]
         code += [FunctionCallI(function_call.id, arg_vars)]
+        code += [VariableI("__return__")]
         return code
 
     def visit_number(self, number):
-        return str(number.number)
+        return [NumberI(number.number)]
 
     def visit_string(self, string):
-        return ["'" + string.value + "'"]
+        print("VISITING STRING: ", string)
+        return [StringI(string)]
 
     def visit_declaration(self, declaration):
         print("VISITING DECLARATION")
@@ -195,7 +127,13 @@ class LinearGenerator:
 
         second_var = add_result(code)
 
-        code.append(first_var + " " + expression.op + " " + second_var)
+        builtin = ""
+        if expression.op == "plus":
+            builtin = "sum"
+        if expression.op == "minus":
+            builtin = "sub"
+
+        code += [FunctionCallI(builtin, [first_var, second_var])]
         return code
 
     def visit_assignment(self, assignment):

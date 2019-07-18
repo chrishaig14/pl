@@ -2,7 +2,9 @@ import collections
 
 from colorama import Fore, Back
 
+from runtime.builtins import _print, _sum, _sub, _mul, _div, _booleq, _boolneq
 from runtime.environment import Environment
+from runtime.instructions import *
 from runtime.store import Store
 
 
@@ -32,163 +34,7 @@ class Stack:
             self.stack.pop()
 
 
-class Instruction:
-    def run(self, env, stack):
-        pass
-
-
-class DeclarationInstr(Instruction):
-    def __init__(self, id: str):
-        self.id = id
-
-    def run(self, env, stack):
-        print("run decl inst")
-        env.define(self.id)
-
-    def __str__(self):
-        return "DECLARE" + " " + self.id
-
-
-class AssignVarValInstr(Instruction):
-    def __init__(self, id: str, val):
-        self.id = id
-        self.val = val
-
-    def run(self, env, stack):
-        print("run assign var val")
-        env.assign(self.id, self.val.construct(env))
-
-    def __str__(self):
-        return "ASSIGN" + " " + self.id + " " + str(self.val)
-
-
-class AssignVarVarInstr(Instruction):
-    def __init__(self, id: str, var: id):
-        self.id = id
-        self.var = var
-
-    def run(self, env, stack):
-        print(Fore.RED)
-        print("ASSIGNING ", self.id, " = ", self.var)
-        print(Fore.RESET)
-        env.assign(self.id, env.get(self.var))
-        print("D IS: ", env.get('d'))
-
-    def __str__(self):
-        return "ASSIGN" + " " + self.id + " " + self.var
-
-
-class ProcCallInstr(Instruction):
-    def __init__(self, id: str, args: [str]):
-        self.id = id
-        self.args = args
-
-    def run(self, env, stack):
-        proc_val = env.get(self.id)
-
-        if proc_val.builtin:
-            print(Fore.CYAN, " CALLING BUILTIN WITH ARGS", Fore.RESET)
-            print(Fore.CYAN, self.args, Fore.RESET)
-            val = proc_val.body([env.get(arg) for arg in self.args])
-            # env.define('_return')
-            # print("VALUE: ::", val)
-            env.assign('__return__', val)
-            return
-        args_val = [env.get(arg) for arg in self.args]
-        print("ARGS: ", self.args)
-        # print("AND STORE: ", store)
-
-        env = proc_val.closure.copy()
-        print("################PARAMETERS: ", proc_val.params)
-
-        for i, param in enumerate(proc_val.params):
-            env.define(param)
-            env.assign(param, args_val[i])
-            print("ASSIGNING: ", param, " VALUE: ", args_val[i])
-        # for statement in reversed(proc_val.body):
-        #     # print("PUSHED: ", statement, "ENV: ", env)
-        #     stack.push((statement, env))
-        print(Back.GREEN)
-        print(Fore.BLACK)
-        print("ENV BEFORE RUNNING BODY OF ", self.id, ": ", env)
-        # print("AND STORE: ", store)
-        print(Back.RESET)
-        print(Fore.RESET)
-        stack.enter()
-        proc_val.body.run(env, stack)
-
-    def __str__(self):
-        return "CALL" + " " + self.id + " " + str(self.args)
-
-
-class BlockInstr(Instruction):
-    def __init__(self, statements: [Instruction]):
-        self.statements = statements
-
-    def run(self, env, stack):
-        # print(Fore.RED)
-
-        # print("RUNNING BLOCK")
-        # print(Fore.RESET)
-        for statement in reversed(self.statements):
-            # print("PUSHED: ", statement, "ENV: ", env)
-            stack.push((statement, env))
-
-
-class IfInstr(Instruction):
-    def __init__(self, cond_var: str, then: [Instruction]):
-        self.cond_var = cond_var
-        self.then = then
-
-    def run(self, env, stack):
-        if env.get(self.cond_var):
-            self.then.run(env, stack)
-
-
-class ReturnInstr(Instruction):
-    def __init__(self, id: str):
-        self.id = id
-
-    def run(self, env, stack):
-        # print("ENV RETURN: ", env)
-        # print("STORE RETURN: ", store)
-        # print("RETURNING: ", self.id)
-        env.assign("__return__", env.get(self.id))
-        # print("RETURN NOW IS: ", env.get("__return__"))
-        # print("ENV RETURN: ", env)
-        # print("STORE RETURN: ", store)
-        stack.leave()
-
-
-class Number:
-    def __init__(self, value):
-        self.value = value
-
-    def construct(self, env):
-        return self
-
-    def __str__(self):
-        return str(self.value)
-
-    def __repr__(self):
-        return self.__str__()
-
-
-class String:
-    def __init__(self, value):
-        self.value = value
-
-    def construct(self, env):
-        return self
-
-    def __str__(self):
-        return str(self.value)
-
-    def __repr__(self):
-        return self.__str__()
-
-
-class ProcVal:
+class FunctionVal:
     def __init__(self, params, body, closure, builtin=False):
         self.params = params
         self.body = body
@@ -200,50 +46,6 @@ class ProcVal:
 
     def __repr__(self):
         return self.__str__()
-
-
-class Proc:
-    def __init__(self, params, body):
-        self.params = params
-        self.body = body
-
-    def construct(self, env):
-        return ProcVal(self.params, self.body, env.copy())
-
-
-def _print(x):
-    print(Back.RED, "PRINT GREEN", Back.RESET)
-    print(Back.GREEN, x, Back.RESET)
-
-
-def _sum(x):
-    print(x)
-    return Number(x[0].value + x[1].value)
-
-
-def _sub(x):
-    print(x)
-    return Number(x[0].value - x[1].value)
-
-
-def _mul(x):
-    print(x)
-    return Number(x[0].value * x[1].value)
-
-
-def _div(x):
-    print(x)
-    return Number(x[0].value / x[1].value)
-
-
-def _booleq(x):
-    print(x)
-    return x[0].value == x[1].value
-
-
-def _boolneq(x):
-    print(x)
-    return x[0].value != x[1].value
 
 
 class Runtime:
@@ -286,6 +88,76 @@ class Runtime:
         self.env.define(name)
         self.env.assign(name, proc)
 
+    def visit_DeclareI(self, declareI):
+        self.env.define(declareI.name)
+
+    def visit_AssignI(self, assignI):
+        # print("ATOM:", assignI.atom)
+        value = assignI.atom.accept(self)
+        # print("VALUE: ", value)
+        self.env.assign(assignI.name, value)
+
+    def visit_FunctionI(self, functionI):
+        funcVal = FunctionVal(functionI.params, functionI.statements, self.env.copy(), False)
+        return funcVal
+
+    def visit_NumberI(self, numberI):
+        return numberI
+
+    def visit_VariableI(self, variableI):
+
+        value = self.env.get(variableI.name)
+        print("GETTING VARIABLE :", variableI.name, " = ", value)
+        return value
+
+    def visit_functionCallI(self, functionCall):
+        print("EXECUTING FUNCTION CALL")
+        proc_val = self.env.get(functionCall.name)
+        if proc_val.builtin:
+            print("EXECUTING BUILTIN FUNCTION CALL")
+            print("FUNCTION ARGUMENTS: ", functionCall.args)
+            print("FUNCTION ARGUMENTS: ", self.env)
+            print("FUNCTION ARGUMENTS: ", self.store)
+            arguments = [self.env.get(arg) for arg in functionCall.args]
+            print("ARGUMENTS FOR BUILTIN: ", arguments)
+            val = proc_val.body(arguments)
+            print("RETURNING FROM BUILTIN FUNCTION CALL: ", val)
+            self.env.assign("__return__", val)
+            return val
+        print("EXECUTING FUNCTION CALL")
+        args_val = [self.env.get(arg) for arg in functionCall.args]
+        env = proc_val.closure.copy()
+        for i, param in enumerate(proc_val.params):
+            env.define(param)
+            env.assign(param, args_val[i])
+        original_env = self.env
+        self.env = env
+        self.stack.enter()
+        proc_val.body.accept(self)
+        print("ENV: ", env)
+        print("ENV: ", original_env)
+        print("STORE:", self.store)
+        self.env = original_env
+
+        returnvalue = self.env.get("__return__")
+        print("2 ) ???????????? IN FUNCTIONCALLI RETURNING VALUE: ", returnvalue)
+        return returnvalue
+
+    def visit_BlockI(self, blockI):
+        for statement in reversed(blockI.statements):
+            self.stack.push((statement, self.env))
+
+    def visit_IfI(self, ifI):
+        if self.env.get(self.cond_var):
+            self.then.run(self.env, self.stack)
+
+    def visit_ReturnI(self, returnI):
+        value = self.env.get(returnI.name)
+        print("RETURNING FROM FUNCTION: ", returnI.name, "=", value)
+        self.env.assign("__return__", value)
+        print("1) RETURN IS:", self.env.get("__return__"))
+        self.stack.leave()
+
     def run(self, prog):
         stack = self.stack
         env = self.env
@@ -295,9 +167,5 @@ class Runtime:
         while not stack.empty():
             x = stack.pop()
             statement, m_env = x
-            print(Back.YELLOW + Fore.BLACK, "STAT: ", statement, Back.RESET + Fore.RESET)
-
-            statement.run(m_env, stack)
-            print(" ENV: ", m_env)
-            print(" STORE: ", store)
-        print(id(env), " ENV: ", env)
+            self.env = m_env
+            statement.accept(self)

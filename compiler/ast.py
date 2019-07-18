@@ -9,6 +9,7 @@ class Program:
 class Array:
     def __init__(self, values):
         self.values = values
+        self.nodetype = "Array"
 
     def accept(self, visitor):
         return visitor.visit_array(self)
@@ -17,6 +18,7 @@ class Array:
 class Block:
     def __init__(self, statements):
         self.statements = statements
+        self.nodetype = "Block"
 
     def accept(self, visitor):
         return visitor.visit_block(self)
@@ -26,6 +28,7 @@ class If:
     def __init__(self, cond, then):
         self.then = then
         self.cond = cond
+        self.nodetype = "If"
 
     def accept(self, visitor):
         return visitor.visit_if(self)
@@ -35,6 +38,7 @@ class FunctionCall:
     def __init__(self, id, args):
         self.args = args
         self.id = id
+        self.nodetype = "FunctionCall"
 
     def accept(self, visitor):
         return visitor.visit_function_call(self)
@@ -45,6 +49,7 @@ class Expression:
         self.first = first
         self.op = op
         self.second = second
+        self.nodetype = "Expression"
 
     def accept(self, visitor):
         return visitor.visit_expression(self)
@@ -54,6 +59,7 @@ class Declaration:
     def __init__(self, id, init):
         self.init = init
         self.id = id
+
 
     def accept(self, visitor):
         return visitor.visit_declaration(self)
