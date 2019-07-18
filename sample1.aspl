@@ -1,1 +1,4 @@
-print([1,2,3,"hello","world"]);
+var x = 2;
+var y = 5;
+var z = y + 4;
+print([x,y,z,"END"]);
