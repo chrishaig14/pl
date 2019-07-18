@@ -36,6 +36,16 @@ class NumberI(CodeI):
     def __str__(self):
         return "Number(" + str(self.value) + ")"
 
+class ArrayI(CodeI):
+    def __init__(self, values):
+        self.values = values
+
+    def accept(self, visitor):
+        return visitor.visit_ArrayI(self)
+
+    def __str__(self):
+        return "Array(" + str(self.values) + ")"
+
 
 class StringI(CodeI):
     def __init__(self, value):

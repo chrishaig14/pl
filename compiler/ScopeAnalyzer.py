@@ -41,6 +41,7 @@ class Scope:
     def to_json(self):
         json = self.scope
         return json
+
     def __repr__(self):
         return str(self.to_json())
 
@@ -100,6 +101,9 @@ class ScopeAnalyzer:
 
     def visit_number(self, number):
         return NodeWithScope(number, self.scope)
+
+    def visit_string(self, string):
+        return NodeWithScope(string, self.scope)
 
     def visit_declaration(self, declaration):
         print("VISITING DECLARATION")

@@ -1,12 +1,1 @@
-var a = 5;
-var n = 7;
-var s = fun(n){
-	var a;
-	a = 10;
-	print(a);
-	print(n+5);
-};
-s(9);
-print(a);
-print(n);
-s(1);
+print([1,2,3,"hello","world"]);

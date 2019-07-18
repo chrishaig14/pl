@@ -38,18 +38,15 @@ class LinearGenerator:
         return BlockI(code)
 
     def visit_array(self, array):
+        print("VISITING ARRAY")
         code = []
-        values = []
+        val_vars = []
         for val in array.values:
-            code += val.accept(self)
-            value_var = add_result(code)
-            values += [value_var]
-        string = "["
-        for value in values:
-            string += value + ","
-        string = string[:-1]
-        string += "]"
-        code += [string]
+            val = val.accept(self)
+            code += val
+            arg_var = add_result(code)
+            val_vars.append(VariableI(arg_var))
+        code += [ArrayI(val_vars)]
         return code
 
     def visit_variable(self, variable):
@@ -86,7 +83,7 @@ class LinearGenerator:
 
     def visit_string(self, string):
         print("VISITING STRING: ", string)
-        return [StringI(string)]
+        return [StringI(string.value)]
 
     def visit_declaration(self, declaration):
         print("VISITING DECLARATION")

@@ -2,11 +2,25 @@ import collections
 
 from colorama import Fore, Back
 
+from compiler.linear_instructions import ArrayI
 from runtime.builtins import _print, _sum, _sub, _mul, _div, _booleq, _boolneq
 from runtime.environment import Environment
-from runtime.instructions import *
+# from runtime.instructions import *
 from runtime.store import Store
 
+
+class ProcVal:
+    def __init__(self, params, body, closure, builtin=False):
+        self.params = params
+        self.body = body
+        self.closure = closure
+        self.builtin = builtin
+
+    def __str__(self):
+        return "PROC VAL"
+
+    def __repr__(self):
+        return self.__str__()
 
 class Stack:
     def __init__(self):
@@ -92,7 +106,7 @@ class Runtime:
         self.env.define(declareI.name)
 
     def visit_AssignI(self, assignI):
-        # print("ATOM: ", type(assignI.atom))
+        print("ATOM: ", type(assignI.atom))
         value = assignI.atom.accept(self)
         self.env.assign(assignI.name, value)
 
@@ -100,8 +114,15 @@ class Runtime:
         funcVal = FunctionVal(functionI.params, functionI.statements, self.env.copy(), False)
         return funcVal
 
+    def visit_ArrayI(self, arrayI):
+        print("ARRAY VALUES: ", arrayI.values)
+        return ArrayI([val.accept(self) for val in arrayI.values])
+
     def visit_NumberI(self, numberI):
         return numberI
+
+    def visit_StringI(self, stringI):
+        return stringI
 
     def visit_VariableI(self, variableI):
 
