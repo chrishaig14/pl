@@ -1,7 +1,10 @@
 fun foo(){}
 class Pepe {
 	var foo;
+	var x;
+	var w;
 	fun bar(){
 		return foo();
 	}
 }
+var x = new Pepe;

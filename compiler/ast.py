@@ -54,11 +54,17 @@ class Expression:
     def accept(self, visitor):
         return visitor.visit_expression(self)
 
+class NewObject:
+    def __init__(self, name):
+        self.name = name
+    def accept(self, visitor):
+        return visitor.visit_newObject(self)
 
 class Declaration:
     def __init__(self, name, init):
         self.init = init
         self.name = name
+        self.nodetype = "Declaration"
 
 
     def accept(self, visitor):
@@ -68,6 +74,7 @@ class Declaration:
 class String:
     def __init__(self, value):
         self.value = value
+        self.nodetype = "String"
 
     def accept(self, visitor):
         return visitor.visit_string(self)
@@ -78,6 +85,7 @@ class Function:
         self.name = name
         self.statements = statements
         self.params = params
+        self.nodetype = "Function"
 
     def accept(self, visitor):
         return visitor.visit_function(self)
@@ -86,6 +94,7 @@ class Class:
     def __init__(self, name, statements):
         self.name = name
         self.statements = statements
+        self.nodetype = "Class"
 
     def accept(self, visitor):
         return visitor.visit_class(self)
@@ -93,6 +102,7 @@ class Class:
 class Return:
     def __init__(self, exp):
         self.exp = exp
+        self.nodetype = "Return"
 
     def accept(self, visitor):
         return visitor.visit_return(self)
@@ -101,6 +111,7 @@ class Return:
 class Variable:
     def __init__(self, name):
         self.name = name
+        self.nodetype = "Variable"
 
     def accept(self, visitor):
         return visitor.visit_variable(self)
@@ -109,6 +120,7 @@ class Variable:
 class Number:
     def __init__(self, number):
         self.number = number
+        self.nodetype = "Number"
 
     def accept(self, visitor):
         return visitor.visit_number(self)
@@ -118,6 +130,7 @@ class Assignment:
     def __init__(self, lvalue, rvalue):
         self.rvalue = rvalue
         self.lvalue = lvalue
+        self.nodetype = "Assignment"
 
     def accept(self, visitor):
         return visitor.visit_assignment(self)

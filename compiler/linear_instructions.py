@@ -115,3 +115,15 @@ class FunctionI(CodeI):
 
     def __str__(self):
         return "FUNCTION " + self.name + " " + str(self.params) + " " + str(self.statements)
+
+class ObjectI(CodeI):
+    def __init__(self, class_name, members):
+        self.members = members
+        self.class_name = class_name
+
+    def accept(self, visitor):
+        return visitor.visit_ObjectI(self)
+
+    def __str__(self):
+        return "OBJECT " + self.class_name + " " + str(self.members)
+

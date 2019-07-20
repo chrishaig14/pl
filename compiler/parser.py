@@ -1,7 +1,7 @@
 from colorama import Fore, Back, Style
 
 from compiler.ast import Expression, Declaration, Assignment, Function, String, Number, Array, FunctionCall, Variable, \
-    If, Return, Block, Program, Class
+    If, Return, Block, Program, Class, NewObject
 
 
 class Parser:
@@ -131,8 +131,6 @@ class Parser:
         print("GOT CLASS NAME:", self.previous_token["data"])
         name = self.previous_token["data"]
 
-
-
         self.expect("lbrace")
         statements = []
         while not self.check("rbrace"):
@@ -147,7 +145,10 @@ class Parser:
 
     def parse_factor(self):
         # factor => number
-
+        if self.match('new'):
+            print("CURRENT TOKEN: ", self.current_token)
+            self.advance()
+            return NewObject(self.previous_token["data"])
         if self.match('string'):
             return String(self.previous_token["data"][1:-1])
         if self.match('number'):

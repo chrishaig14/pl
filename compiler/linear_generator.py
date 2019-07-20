@@ -56,6 +56,18 @@ class LinearGenerator:
         print("VISITING FUNCTION")
         code = [FunctionI(function.name, function.params, function.statements.accept(self))]
         return code
+    def visit_class(self, class_s):
+        print("VISITING CLASS")
+        members = []
+        for st in class_s.statements.statements:
+            if st.nodetype == "Declaration":
+                members.append(st.name)
+        code = [FunctionI(class_s.name + "_init", [], [
+            DeclareI("new_object"),
+            AssignI("new_object",ObjectI(class_s.name,members)),
+            ReturnI("new_object")
+        ])]
+        return code
 
     def to_string(self, arr):
         string = ""

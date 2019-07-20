@@ -1,4 +1,4 @@
-keywords = ["var", "fun", "return", "if", "else", "class"]
+keywords = ["var", "fun", "return", "if", "else", "class", "new"]
 ops = ["++", "--", "+", "-", "*", "/", "=", "==", "(", ")", "{", "}",",","[","]"]
 special = [";"]
 

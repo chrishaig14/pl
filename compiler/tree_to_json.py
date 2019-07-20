@@ -24,6 +24,14 @@ class TreeToJson:
         obj["name"] = variable.name
         return obj
 
+    def visit_newObject(self, newObject):
+        obj = {}
+        obj["type"] = "new object"
+        obj["class"] = newObject.name
+        # obj["params"] = function.params
+        # obj["statements"] = function.statements.accept(self)
+        return obj
+
     def visit_function(self, function):
         obj = {}
         obj["type"] = "function"
