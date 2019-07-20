@@ -1,12 +1,8 @@
-fun bar(b){
-	return 1;
-}
-fun foo(a){
-	fun bar(c){
-		return c;
+class MyClass{
+	var x;
+	var y;
+	fun foo(a){
+		return a;
 	}
-	return bar(5);
+	var z;
 }
-print(foo(7));
-print(bar(5));
-bar = 5;

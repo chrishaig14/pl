@@ -1,7 +1,7 @@
 from colorama import Fore, Back, Style
 
 from compiler.ast import Expression, Declaration, Assignment, Function, String, Number, Array, FunctionCall, Variable, \
-    If, Return, Block, Program
+    If, Return, Block, Program, Class
 
 
 class Parser:
@@ -88,6 +88,63 @@ class Parser:
 
         return Function(name, params, statements)
 
+    def parse_class_statement(self):
+        # statement => declaration;
+        # if self.check("class"):
+        #     class_s = self.parse_class()
+        #     return class_s
+        if self.check("var"):
+            decl = self.parse_declaration()
+
+            self.expect("semicolon")
+
+            if decl is not None:
+                return decl
+
+        # statement => assign_exp;
+        if self.check("fun"):
+            function = self.parse_function()
+            return function
+        # if self.check("id"):
+        #     assign = self.parse_assign_exp()
+        #
+        #     self.expect("semicolon")
+        #     if assign is not None:
+        #         return assign
+        # if self.check("return"):
+        #     self.advance()
+        #     exp = self.parse_expression()
+        #
+        #     self.expect("semicolon")
+        #     return Return(exp)
+        # if self.check("if"):
+        #     ifst = self.parse_if()
+        #     return ifst
+
+        print("Error: expected statement, got", self.current_token["type"])
+        exit(1)
+
+    def parse_class(self):
+        print("NOW PARSING A CLASS")
+        self.match("class")
+        self.expect("id")
+        print("GOT CLASS NAME:", self.previous_token["data"])
+        name = self.previous_token["data"]
+
+
+
+        self.expect("lbrace")
+        statements = []
+        while not self.check("rbrace"):
+            statement = self.parse_class_statement()
+            statements.append(statement)
+
+        self.advance()
+        # return Block(statements)
+
+        # statements = self.parse_block()
+        return Class(name, Block(statements))
+
     def parse_factor(self):
         # factor => number
 
@@ -158,6 +215,9 @@ class Parser:
 
     def parse_statement(self):
         # statement => declaration;
+        if self.check("class"):
+            class_s = self.parse_class()
+            return class_s
         if self.check("var"):
             decl = self.parse_declaration()
 
@@ -187,6 +247,7 @@ class Parser:
             return ifst
 
         print("Error: expected statement, got", self.current_token["type"])
+        exit(1)
 
     def match(self, token):
         if self.check(token):
@@ -200,6 +261,7 @@ class Parser:
         else:
             print("<<<### ERROR: expected", token, "instead of",
                   self.current_token["type"], "at line", self.current_token["line"], "###>>>")
+            exit(1)
 
     def advance(self):
         self.previous_token = self.current_token

@@ -82,6 +82,13 @@ class Function:
     def accept(self, visitor):
         return visitor.visit_function(self)
 
+class Class:
+    def __init__(self, name, statements):
+        self.name = name
+        self.statements = statements
+
+    def accept(self, visitor):
+        return visitor.visit_class(self)
 
 class Return:
     def __init__(self, exp):
