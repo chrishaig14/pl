@@ -1,4 +1,12 @@
-var x = 2;
-var y = 5;
-var z = y + 4;
-print([x,y,z,"END"]);
+fun bar(b){
+	return 1;
+}
+fun foo(a){
+	fun bar(c){
+		return c;
+	}
+	return bar(5);
+}
+print(foo(7));
+print(bar(5));
+bar = 5;

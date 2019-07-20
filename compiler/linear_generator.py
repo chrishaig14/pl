@@ -54,7 +54,7 @@ class LinearGenerator:
 
     def visit_function(self, function):
         print("VISITING FUNCTION")
-        code = [FunctionI(function.params, function.statements.accept(self))]
+        code = [FunctionI(function.name, function.params, function.statements.accept(self))]
         return code
 
     def to_string(self, arr):
@@ -74,7 +74,7 @@ class LinearGenerator:
             code += arg
             arg_var = add_result(code)
             arg_vars.append(arg_var)
-        code += [FunctionCallI(function_call.id, arg_vars)]
+        code += [FunctionCallI(function_call.name, arg_vars)]
         code += [VariableI("__return__")]
         return code
 
@@ -88,10 +88,10 @@ class LinearGenerator:
     def visit_declaration(self, declaration):
         print("VISITING DECLARATION")
         code = []
-        code.append(DeclareI(declaration.id))
+        code.append(DeclareI(declaration.name))
         if declaration.init is not None:
             code += declaration.init.accept(self)
-            code[-1] = AssignI(declaration.id, code[-1])
+            code[-1] = AssignI(declaration.name, code[-1])
         return code
 
     def visit_if(self, ifst):

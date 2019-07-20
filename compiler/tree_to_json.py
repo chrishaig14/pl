@@ -27,6 +27,7 @@ class TreeToJson:
     def visit_function(self, function):
         obj = {}
         obj["type"] = "function"
+        obj["name"] = function.name
         obj["params"] = function.params
         obj["statements"] = function.statements.accept(self)
         return obj
@@ -34,7 +35,7 @@ class TreeToJson:
     def visit_function_call(self, function_call):
         obj = {}
         obj["type"] = "function call"
-        obj["id"] = function_call.id
+        obj["name"] = function_call.name
         obj["args"] = [arg.accept(self) for arg in function_call.args]
         return obj
 
@@ -52,7 +53,7 @@ class TreeToJson:
     def visit_declaration(self, declaration):
         obj = {}
         obj["type"] = "declaration"
-        obj["id"] = declaration.id
+        obj["name"] = declaration.name
         if declaration.init is not None:
             obj["init"] = declaration.init.accept(self)
         return obj

@@ -22,6 +22,7 @@ class ProcVal:
     def __repr__(self):
         return self.__str__()
 
+
 class Stack:
     def __init__(self):
         self.stack = collections.deque()
@@ -111,7 +112,9 @@ class Runtime:
         self.env.assign(assignI.name, value)
 
     def visit_FunctionI(self, functionI):
+        self.env.define(functionI.name)
         funcVal = FunctionVal(functionI.params, functionI.statements, self.env.copy(), False)
+        self.env.assign(functionI.name, funcVal)
         return funcVal
 
     def visit_ArrayI(self, arrayI):

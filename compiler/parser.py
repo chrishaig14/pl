@@ -70,6 +70,10 @@ class Parser:
 
     def parse_function(self):
         print("NOW PARSING A FUNCTION")
+        self.match("fun")
+        self.expect("id")
+        print("GOT FUNCTION NAME:", self.previous_token["data"])
+        name = self.previous_token["data"]
         self.expect("lparen")
         params = []
         if self.match("id"):
@@ -82,7 +86,7 @@ class Parser:
 
         statements = self.parse_block()
 
-        return Function(params, statements)
+        return Function(name, params, statements)
 
     def parse_factor(self):
         # factor => number
@@ -132,9 +136,6 @@ class Parser:
             if exp is not None:
                 self.expect("rparen")
                 return exp
-        if self.match("fun"):
-            fun = self.parse_function()
-            return fun
 
     def parse_block(self):
         self.expect("lbrace")
@@ -166,6 +167,9 @@ class Parser:
                 return decl
 
         # statement => assign_exp;
+        if self.check("fun"):
+            function = self.parse_function()
+            return function
         if self.check("id"):
             assign = self.parse_assign_exp()
 

@@ -35,9 +35,9 @@ class If:
 
 
 class FunctionCall:
-    def __init__(self, id, args):
+    def __init__(self, name, args):
         self.args = args
-        self.id = id
+        self.name = name
         self.nodetype = "FunctionCall"
 
     def accept(self, visitor):
@@ -56,9 +56,9 @@ class Expression:
 
 
 class Declaration:
-    def __init__(self, id, init):
+    def __init__(self, name, init):
         self.init = init
-        self.id = id
+        self.name = name
 
 
     def accept(self, visitor):
@@ -74,7 +74,8 @@ class String:
 
 
 class Function:
-    def __init__(self, params, statements):
+    def __init__(self, name, params, statements):
+        self.name = name
         self.statements = statements
         self.params = params
 

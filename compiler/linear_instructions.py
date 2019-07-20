@@ -104,7 +104,8 @@ class BlockI(CodeI):
 
 
 class FunctionI(CodeI):
-    def __init__(self, params, statements):
+    def __init__(self, name, params, statements):
+        self.name = name
         self.params = params
         self.statements = statements
         self.builtin = False
@@ -113,4 +114,4 @@ class FunctionI(CodeI):
         return visitor.visit_FunctionI(self)
 
     def __str__(self):
-        return "FUNCTION " + str(self.params) + " " + str(self.statements)
+        return "FUNCTION " + self.name + " " + str(self.params) + " " + str(self.statements)
