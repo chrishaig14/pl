@@ -1,8 +1,7 @@
-class MyClass{
-	var x;
-	var y;
-	fun foo(a){
-		return a;
+fun foo(){}
+class Pepe {
+	var foo;
+	fun bar(){
+		return foo();
 	}
-	var z;
 }

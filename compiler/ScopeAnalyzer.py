@@ -35,7 +35,7 @@ class Scope:
         self.scope.pop(name)
 
     def get(self, name):
-        return name in self.scope
+        return name in self.scope or (self.parent and self.parent.get(name))
 
     def snapshot(self):
         my_copy = Scope()
@@ -124,10 +124,20 @@ class ScopeAnalyzer:
         for arg in function_call.args:
             arg.accept(self)
         print("LEAVING FUNCTION CALL", function_call.name)
-            # arg = arg.accept(self)
-            # args.append(arg)
+        # arg = arg.accept(self)
+        # args.append(arg)
         # function_call.args = args
         # return NodeWithScope(function_call, self.scope)
+
+    def visit_class(self, class_s):
+        print("VISITING CLASS, ", class_s.name)
+        if self.scope.get(class_s.name):
+            print("ERROR: ", class_s.name, " already defined in scope")
+            exit(1)
+        self.scope.add(class_s.name)
+        self.enter()
+        class_s.statements.accept(self)
+        self.leave()
 
     def visit_number(self, number):
         # return NodeWithScope(number, self.scope)
@@ -142,7 +152,7 @@ class ScopeAnalyzer:
         # parent_scope = self.scope
         # self.scope = self.scope.snapshot()
         # self.scope.enter()
-        self.scope.add(declaration.id)
+        self.scope.add(declaration.name)
         if declaration.init is not None:
             # declaration.init = declaration.init.accept(self)
             declaration.init.accept(self)
