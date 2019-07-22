@@ -8,3 +8,4 @@ class Pepe {
 	}
 }
 var x = new Pepe;
+print(x);

@@ -139,6 +139,9 @@ class ScopeAnalyzer:
         class_s.statements.accept(self)
         self.leave()
 
+    def visit_newObject(self, newObject):
+        pass
+
     def visit_number(self, number):
         # return NodeWithScope(number, self.scope)
         pass

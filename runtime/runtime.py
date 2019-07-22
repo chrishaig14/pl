@@ -127,9 +127,13 @@ class Runtime:
     def visit_StringI(self, stringI):
         return stringI
 
+    def visit_ObjectI(self, objectI):
+        return objectI
+
     def visit_VariableI(self, variableI):
 
         value = self.env.get(variableI.name)
+        print("VALUE OF VARIABLE: ", variableI.name, " :",value)
         return value
 
     def visit_functionCallI(self, functionCall):
