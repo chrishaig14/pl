@@ -15,15 +15,15 @@ class DeclareI(CodeI):
 
 
 class AssignI(CodeI):
-    def __init__(self, name, atom):
-        self.name = name
+    def __init__(self, lvalue, atom):
+        self.lvalue = lvalue
         self.atom = atom
 
     def accept(self, visitor):
         return visitor.visit_AssignI(self)
 
     def __str__(self):
-        return "ASSIGN " + self.name + " " + str(self.atom)
+        return "ASSIGN " + str(self.lvalue) + " " + str(self.atom)
 
 
 class NumberI(CodeI):
@@ -89,7 +89,7 @@ class ReturnI(CodeI):
         return visitor.visit_ReturnI(self)
 
     def __str__(self):
-        return "RETURN " + self.name
+        return "Return(" + str(self.name)+")"
 
 
 class BlockI(CodeI):
@@ -102,6 +102,37 @@ class BlockI(CodeI):
     def __str__(self):
         return "BLOCK [" + str(self.statements) + "]"
 
+class MemberI(CodeI):
+    def __init__(self, exp, name):
+        self.exp = exp
+        self.name = name
+
+    def accept(self, visitor):
+        return visitor.visit_MemberI(self)
+
+    def __str__(self):
+        return "Member(" + self.exp + "." + str(self.name)+")"
+
+class RefMemberI(CodeI):
+    def __init__(self, exp, name):
+        self.exp = exp
+        self.name = name
+
+    def accept(self, visitor):
+        return visitor.visit_RefMemberI(self)
+
+    def __str__(self):
+        return "RefMember(" + self.exp + "." + self.name+")"
+
+class RefVariableI(CodeI):
+    def __init__(self, name):
+        self.name = name
+
+    def accept(self, visitor):
+        return visitor.visit_RefVariableI(self)
+
+    def __str__(self):
+        return "RefVariable(" + self.name+")"
 
 class FunctionI(CodeI):
     def __init__(self, name, params, statements):
@@ -114,7 +145,7 @@ class FunctionI(CodeI):
         return visitor.visit_FunctionI(self)
 
     def __str__(self):
-        return "FUNCTION " + self.name + " " + str(self.params) + " " + str(self.statements)
+        return "Function(" + self.name + "," + str(self.params) + "," + str(self.statements)+")"
 
 class ObjectI(CodeI):
     def __init__(self, class_name, members):
@@ -125,5 +156,5 @@ class ObjectI(CodeI):
         return visitor.visit_ObjectI(self)
 
     def __str__(self):
-        return "OBJECT " + self.class_name + " " + str(self.members)
+        return "Object(" + self.class_name + "," + str(self.members)+")"
 

@@ -30,6 +30,8 @@ class Environment:
             return value
         else:
             print("ERROR: variable " + name + " not found")
+    def getRef(self, name):
+        return self.dict[name]
 
     def __str__(self):
         return "ENVIRONMENT " + ":" + str(self.dict)

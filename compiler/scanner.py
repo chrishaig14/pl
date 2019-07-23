@@ -1,5 +1,5 @@
 keywords = ["var", "fun", "return", "if", "else", "class", "new"]
-ops = ["++", "--", "+", "-", "*", "/", "=", "==", "(", ")", "{", "}",",","[","]"]
+ops = ["++", "--", "+", "-", "*", "/", "=", "==", "(", ")", "{", "}",",","[","]","."]
 special = [";"]
 
 
@@ -72,6 +72,11 @@ class Scanner:
             cur += 1
             col += 1
             return ("lparen", None), start, cur, line, col
+        elif str[cur] == ".":
+            start = cur
+            cur += 1
+            col += 1
+            return ("dot", None), start, cur, line, col
         elif str[cur] == "[":
             start = cur
             cur += 1

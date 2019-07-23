@@ -1,7 +1,7 @@
 from colorama import Fore, Back, Style
 
 from compiler.ast import Expression, Declaration, Assignment, Function, String, Number, Array, FunctionCall, Variable, \
-    If, Return, Block, Program, Class, NewObject
+    If, Return, Block, Program, Class, NewObject, Member, SetMember, SetVariable
 
 
 class Parser:
@@ -12,9 +12,12 @@ class Parser:
 
     def parse_assign_exp(self):
         lvalue = self.parse_expression()
-
         if self.match("assign"):
             rvalue = self.parse_expression()
+            if lvalue.nodetype == "Member":
+                lvalue = SetMember(lvalue.exp, lvalue.name)
+            elif lvalue.nodetype == "Variable":
+                lvalue = SetVariable(lvalue.name)
             return Assignment(lvalue, rvalue)
         else:
             return lvalue
@@ -39,7 +42,6 @@ class Parser:
             self.advance()
             second = self.parse_math_exp()
             exp = Expression(exp, op, second)
-
         return exp
 
     def parse_math_exp(self):
@@ -143,7 +145,7 @@ class Parser:
         # statements = self.parse_block()
         return Class(name, Block(statements))
 
-    def parse_factor(self):
+    def parse_minimal(self):
         # factor => number
         if self.match('new'):
             print("CURRENT TOKEN: ", self.current_token)
@@ -194,6 +196,19 @@ class Parser:
             if exp is not None:
                 self.expect("rparen")
                 return exp
+
+    def parse_factor(self):
+        a = self.parse_minimal()
+        if self.check("dot"):
+            self.advance()
+            self.expect("id")
+            mem = Member(a, self.previous_token["data"])
+            while self.check("dot"):
+                self.advance()
+                self.expect("id")
+                mem = Member(mem, self.previous_token["data"])
+            return mem
+        return a
 
     def parse_block(self):
         self.expect("lbrace")

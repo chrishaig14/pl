@@ -11,7 +11,18 @@ class TreeToJson:
         obj["type"] = "block"
         obj["statements"] = [st.accept(self) for st in block.statements]
         return obj
-
+    def visit_member(self, member):
+        obj = {}
+        obj["type"] = "member"
+        obj["exp"] = member.exp.accept(self)
+        obj["name"] = member.name
+        return obj
+    def visit_setMember(self, member):
+        obj = {}
+        obj["type"] = "set member"
+        obj["exp"] = member.exp.accept(self)
+        obj["name"] = member.name
+        return obj
     def visit_array(self, array):
         obj = {}
         obj["type"] = "array"
@@ -21,6 +32,12 @@ class TreeToJson:
     def visit_variable(self, variable):
         obj = {}
         obj["type"] = "variable"
+        obj["name"] = variable.name
+        return obj
+
+    def visit_setVariable(self, variable):
+        obj = {}
+        obj["type"] = "set variable"
         obj["name"] = variable.name
         return obj
 

@@ -28,11 +28,11 @@ class Compiler:
         logger.ACTIVE = True
         logger.DEBUG = False
 
-        scope_analyzer = ScopeAnalyzer()
+        # scope_analyzer = ScopeAnalyzer()
 
         program_copy = copy.deepcopy(program)
 
-        program_copy.accept(scope_analyzer)
+        # program_copy.accept(scope_analyzer)
 
         linear_generator = LinearGenerator()
         code = program.accept(linear_generator)

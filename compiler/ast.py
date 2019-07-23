@@ -54,11 +54,14 @@ class Expression:
     def accept(self, visitor):
         return visitor.visit_expression(self)
 
+
 class NewObject:
     def __init__(self, name):
         self.name = name
+
     def accept(self, visitor):
         return visitor.visit_newObject(self)
+
 
 class Declaration:
     def __init__(self, name, init):
@@ -66,9 +69,28 @@ class Declaration:
         self.name = name
         self.nodetype = "Declaration"
 
-
     def accept(self, visitor):
         return visitor.visit_declaration(self)
+
+
+class Member:
+    def __init__(self, exp, name):
+        self.exp = exp
+        self.name = name
+        self.nodetype = "Member"
+
+    def accept(self, visitor):
+        return visitor.visit_member(self)
+
+
+class SetMember:
+    def __init__(self, exp, name):
+        self.exp = exp
+        self.name = name
+        self.nodetype = "SetMember"
+
+    def accept(self, visitor):
+        return visitor.visit_setMember(self)
 
 
 class String:
@@ -90,6 +112,7 @@ class Function:
     def accept(self, visitor):
         return visitor.visit_function(self)
 
+
 class Class:
     def __init__(self, name, statements):
         self.name = name
@@ -98,6 +121,7 @@ class Class:
 
     def accept(self, visitor):
         return visitor.visit_class(self)
+
 
 class Return:
     def __init__(self, exp):
@@ -115,6 +139,15 @@ class Variable:
 
     def accept(self, visitor):
         return visitor.visit_variable(self)
+
+
+class SetVariable:
+    def __init__(self, name):
+        self.name = name
+        self.nodetype = "SetVariable"
+
+    def accept(self, visitor):
+        return visitor.visit_setVariable(self)
 
 
 class Number:

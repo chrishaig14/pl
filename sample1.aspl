@@ -1,11 +1,13 @@
-fun foo(){}
-class Pepe {
-	var foo;
-	var x;
-	var w;
-	fun bar(){
-		return foo();
-	}
+class Foo{
+	var y;
 }
-var x = new Pepe;
-print(x);
+var x = new Foo;
+x.y = new Foo;
+print(x.y);
+print(x.y.y);
+x.y.y = 5;
+print(x.y.y);
+print(x.y);
+x.y = 14;
+print(x.y);
+print(x.y.y);

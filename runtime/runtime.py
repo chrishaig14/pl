@@ -1,8 +1,9 @@
 import collections
+import copy
 
 from colorama import Fore, Back
 
-from compiler.linear_instructions import ArrayI
+from compiler.linear_instructions import ArrayI, NumberI
 from runtime.builtins import _print, _sum, _sub, _mul, _div, _booleq, _boolneq
 from runtime.environment import Environment
 # from runtime.instructions import *
@@ -104,12 +105,17 @@ class Runtime:
         self.env.assign(name, proc)
 
     def visit_DeclareI(self, declareI):
+        print("ENV BEFORE DECLARATION: ", self.env)
         self.env.define(declareI.name)
+        print("ENV AFTER DECLARATION: ", self.env)
 
     def visit_AssignI(self, assignI):
-        print("ATOM: ", type(assignI.atom))
+        print("lvalue: ", assignI.lvalue)
+        # print("lvalue: ", type(assignI.lvalue))
+        print("atom: ", assignI.atom)
         value = assignI.atom.accept(self)
-        self.env.assign(assignI.name, value)
+
+        self.store.assign(assignI.lvalue.accept(self), value)
 
     def visit_FunctionI(self, functionI):
         self.env.define(functionI.name)
@@ -121,6 +127,17 @@ class Runtime:
         print("ARRAY VALUES: ", arrayI.values)
         return ArrayI([val.accept(self) for val in arrayI.values])
 
+    def visit_MemberI(self, memberI):
+        obj = self.env.get(memberI.exp)
+        return obj.members.get(memberI.name)
+
+    def visit_RefMemberI(self, refMemberI):
+        obj = self.env.get(refMemberI.exp)
+        return obj.members.getRef(refMemberI.name)
+
+    def visit_RefVariableI(self, refVariableI):
+        return self.env.getRef(refVariableI.name)
+
     def visit_NumberI(self, numberI):
         return numberI
 
@@ -128,15 +145,25 @@ class Runtime:
         return stringI
 
     def visit_ObjectI(self, objectI):
-        return objectI
+        cop = copy.deepcopy(objectI)
+        # env = self.env.copy()
+        env = Environment(self.store,"ASD")
+        k = 0
+        for m in cop.members:
+            env.define(m)
+            env.assign(m, NumberI(k))
+            k += 1
+        cop.members = env
+        return cop
 
     def visit_VariableI(self, variableI):
 
         value = self.env.get(variableI.name)
-        print("VALUE OF VARIABLE: ", variableI.name, " :",value)
+        print("VALUE OF VARIABLE: ", variableI.name, " :", value)
         return value
 
     def visit_functionCallI(self, functionCall):
+        print("CALLLLLLLLING FUNCTIIIIIIIIIIIIIIIIION")
         proc_val = self.env.get(functionCall.name)
         if proc_val.builtin:
             arguments = [self.env.get(arg) for arg in functionCall.args]
@@ -151,14 +178,20 @@ class Runtime:
         original_env = self.env
         self.env = env
         self.stack.enter()
+        # print("ENVIRONMENT IN FUNCTION: ", self.env)
         proc_val.body.accept(self)
+        # print("ENVIRONMENT IN FUNCTION AT THE END: ", self.env)
+        # print("STORE IN FUNCTION AT THE END: ", self.store)
         self.env = original_env
+        # self.stack.leave()
 
         returnvalue = self.env.get("__return__")
-        return returnvalue
+        # return returnvalue
 
     def visit_BlockI(self, blockI):
+        print("PUSHING BLOCK:")
         for statement in reversed(blockI.statements):
+            print("PUSHED: ", statement)
             self.stack.push((statement, self.env))
 
     def visit_IfI(self, ifI):
@@ -166,7 +199,8 @@ class Runtime:
             self.then.run(self.env, self.stack)
 
     def visit_ReturnI(self, returnI):
-        value = self.env.get(returnI.name)
+        value = returnI.name.accept(self)
+        print("RETURNING VALUE: ", value)
         self.env.assign("__return__", value)
         self.stack.leave()
 

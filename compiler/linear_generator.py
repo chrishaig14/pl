@@ -17,7 +17,7 @@ def add_result(code):
     var = new_var()
     code[-1] = DeclareI(var)
     code.append("")
-    code[-1] = AssignI(var, last)
+    code[-1] = AssignI(RefVariableI(var), last)
     return var
 
 
@@ -52,21 +52,32 @@ class LinearGenerator:
     def visit_variable(self, variable):
         return [VariableI(variable.name)]
 
+    def visit_setVariable(self, setVariable):
+        return [RefVariableI(setVariable.name)]
+
     def visit_function(self, function):
         print("VISITING FUNCTION")
         code = [FunctionI(function.name, function.params, function.statements.accept(self))]
         return code
 
+    def visit_setMember(self, setMember):
+        code = setMember.exp.accept(self)
+        res_var = add_result(code)
+        code += [RefMemberI(res_var, setMember.name)]
+        return code
+
+    # code +=
     def visit_class(self, class_s):
         print("VISITING CLASS")
         members = []
         for st in class_s.statements.statements:
             if st.nodetype == "Declaration":
                 members.append(st.name)
+        members = {x: None for x in members}
         code = [FunctionI(class_s.name + "_init", [], BlockI([
             DeclareI("new_object"),
-            AssignI("new_object", ObjectI(class_s.name, members)),
-            ReturnI("new_object")
+            AssignI(RefVariableI("new_object"), ObjectI(class_s.name, members)),
+            ReturnI(VariableI("new_object"))
         ]))]
         return code
 
@@ -76,6 +87,12 @@ class LinearGenerator:
             string += a + " "
         string = string[:-1]
         return string
+
+    def visit_member(self, member):
+        code = member.exp.accept(self)
+        exp_var = add_result(code)
+        code += [MemberI(exp_var, member.name)]
+        return code
 
     def visit_function_call(self, function_call):
         print("VISITING FUNCTION CALL")
@@ -109,7 +126,7 @@ class LinearGenerator:
         code.append(DeclareI(declaration.name))
         if declaration.init is not None:
             code += declaration.init.accept(self)
-            code[-1] = AssignI(declaration.name, code[-1])
+            code[-1] = AssignI(RefVariableI(declaration.name), code[-1])
         return code
 
     def visit_if(self, ifst):
@@ -125,7 +142,7 @@ class LinearGenerator:
         code = []
         code += return_s.exp.accept(self)
         return_var = add_result(code)
-        code += [ReturnI(return_var)]
+        code += [ReturnI(VariableI(return_var))]
         return code
 
     def visit_expression(self, expression):
@@ -151,5 +168,8 @@ class LinearGenerator:
         code = assignment.rvalue.accept(self)
         rvalue = add_result(code)
         lvalue = assignment.lvalue.accept(self)
-        code += [AssignI(assignment.lvalue.name, VariableI(rvalue))]
+        print("LVALUE CODE: ", lvalue[:-1])
+        print("LVALUE CODE: ", lvalue[-1])
+        code += lvalue[:-1]
+        code += [AssignI(lvalue[-1], VariableI(rvalue))]
         return code
