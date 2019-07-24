@@ -2,12 +2,10 @@ class Foo{
 	var y;
 }
 var x = new Foo;
-x.y = new Foo;
+x.y = 5;
+var z = x;
 print(x.y);
-print(x.y.y);
-x.y.y = 5;
-print(x.y.y);
+print(z.y);
+z.y = 1;
 print(x.y);
-x.y = 14;
-print(x.y);
-print(x.y.y);
+print(z.y);

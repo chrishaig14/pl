@@ -105,14 +105,14 @@ class Runtime:
         self.env.assign(name, proc)
 
     def visit_DeclareI(self, declareI):
-        print("ENV BEFORE DECLARATION: ", self.env)
+        # print("ENV BEFORE DECLARATION: ", self.env)
         self.env.define(declareI.name)
-        print("ENV AFTER DECLARATION: ", self.env)
+        # print("ENV AFTER DECLARATION: ", self.env)
 
     def visit_AssignI(self, assignI):
-        print("lvalue: ", assignI.lvalue)
+        # print("lvalue: ", assignI.lvalue)
         # print("lvalue: ", type(assignI.lvalue))
-        print("atom: ", assignI.atom)
+        # print("atom: ", assignI.atom)
         value = assignI.atom.accept(self)
 
         self.store.assign(assignI.lvalue.accept(self), value)
@@ -159,11 +159,11 @@ class Runtime:
     def visit_VariableI(self, variableI):
 
         value = self.env.get(variableI.name)
-        print("VALUE OF VARIABLE: ", variableI.name, " :", value)
+        # print("VALUE OF VARIABLE: ", variableI.name, " :", value)
         return value
 
     def visit_functionCallI(self, functionCall):
-        print("CALLLLLLLLING FUNCTIIIIIIIIIIIIIIIIION")
+        # print("CALLLLLLLLING FUNCTIIIIIIIIIIIIIIIIION")
         proc_val = self.env.get(functionCall.name)
         if proc_val.builtin:
             arguments = [self.env.get(arg) for arg in functionCall.args]
@@ -189,9 +189,9 @@ class Runtime:
         # return returnvalue
 
     def visit_BlockI(self, blockI):
-        print("PUSHING BLOCK:")
+        # print("PUSHING BLOCK:")
         for statement in reversed(blockI.statements):
-            print("PUSHED: ", statement)
+            # print("PUSHED: ", statement)
             self.stack.push((statement, self.env))
 
     def visit_IfI(self, ifI):
@@ -200,7 +200,7 @@ class Runtime:
 
     def visit_ReturnI(self, returnI):
         value = returnI.name.accept(self)
-        print("RETURNING VALUE: ", value)
+        # print("RETURNING VALUE: ", value)
         self.env.assign("__return__", value)
         self.stack.leave()
 
