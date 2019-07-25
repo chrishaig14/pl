@@ -68,7 +68,7 @@ class Runtime:
 
     def __init__(self):
         store = Store()
-
+        self.globals = {}
         env = Environment(store, '0')
 
         builtin_print = ProcVal(None, _print, None, True)
@@ -101,8 +101,9 @@ class Runtime:
             self.add_builtin(name, proc)
 
     def add_builtin(self, name, proc):
-        self.env.define(name)
-        self.env.assign(name, proc)
+        # self.env.define(name)
+        # self.env.assign(name, proc)
+        self.globals[name] = proc
 
     def visit_DeclareI(self, declareI):
         # print("ENV BEFORE DECLARATION: ", self.env)
@@ -118,9 +119,10 @@ class Runtime:
         self.store.assign(assignI.lvalue.accept(self), value)
 
     def visit_FunctionI(self, functionI):
-        self.env.define(functionI.name)
+        # self.globals.define(functionI.name)
+        print("DEFINING FUNCTION : ", functionI.name)
         funcVal = FunctionVal(functionI.params, functionI.statements, self.env.copy(), False)
-        self.env.assign(functionI.name, funcVal)
+        self.globals[functionI.name] = funcVal
         return funcVal
 
     def visit_ArrayI(self, arrayI):
@@ -147,7 +149,7 @@ class Runtime:
     def visit_ObjectI(self, objectI):
         cop = copy.deepcopy(objectI)
         # env = self.env.copy()
-        env = Environment(self.store,"ASD")
+        env = Environment(self.store, "ASD")
         k = 0
         for m in cop.members:
             env.define(m)
@@ -162,15 +164,44 @@ class Runtime:
         # print("VALUE OF VARIABLE: ", variableI.name, " :", value)
         return value
 
-    def visit_functionCallI(self, functionCall):
-        # print("CALLLLLLLLING FUNCTIIIIIIIIIIIIIIIIION")
-        proc_val = self.env.get(functionCall.name)
+    def visit_MemberI(self, memberI):
+        print("VISITING MEMBER: ", memberI.exp, " . ", memberI.name)
+        obj = self.env.get(memberI.exp)
+        print("OBJECT: ", obj)
+        obj_member = obj.members.get(memberI.name)
+        if obj_member is None:
+            name = obj.class_name + "_" + memberI.name
+            class_member = self.globals[name]
+            print(name, " IS A CLASS MEMBER: ", class_member)
+            return class_member
+        print("IS AN OBJECT MEMBER: ", obj_member)
+        return obj_member
+
+    def visit_member(self, member):
+        pass
+
+    def visit_methodCallI(self, methodCallI):
+        print("before accept mem: ", methodCallI.mem)
+        # print("MEM EXP:", methodCallI.mem.exp)
+        # obj = methodCallI.mem.exp
+        # mem = methodCallI.mem.accept(self)
+        obj = self.env.get(methodCallI.name)
+        name = obj.class_name + "_" + methodCallI.mem
+        class_member = self.globals[name]
+        print(name, " IS A CLASS MEMBER: ", class_member)
+        # return class_member
+
+
+        # print("mem: ", mem)
+        self.call_function(class_member,[methodCallI.name])
+
+    def call_function(self, proc_val, functionCallargs):
         if proc_val.builtin:
-            arguments = [self.env.get(arg) for arg in functionCall.args]
+            arguments = [self.env.get(arg) for arg in functionCallargs]
             val = proc_val.body(arguments)
             self.env.assign("__return__", val)
             return val
-        args_val = [self.env.get(arg) for arg in functionCall.args]
+        args_val = [self.env.get(arg) for arg in functionCallargs]
         env = proc_val.closure.copy()
         for i, param in enumerate(proc_val.params):
             env.define(param)
@@ -186,6 +217,11 @@ class Runtime:
         # self.stack.leave()
 
         returnvalue = self.env.get("__return__")
+
+    def visit_functionCallI(self, functionCall):
+        # print("CALLLLLLLLING FUNCTIIIIIIIIIIIIIIIIION")
+        proc_val = self.globals[functionCall.name]
+        self.call_function(proc_val, functionCall.args)
         # return returnvalue
 
     def visit_BlockI(self, blockI):

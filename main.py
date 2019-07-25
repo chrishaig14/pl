@@ -1,3 +1,5 @@
+from colorama import Back
+
 from compiler.compiler import Compiler
 from runtime.runtime import Runtime
 
@@ -9,8 +11,11 @@ print("SOURCE IS: ", source)
 compiler = Compiler()
 code = compiler.compile(source)
 
+print(Back.RED)
+
 for line in code:
     print(line)
+print(Back.RESET)
 
 runtime = Runtime()
 runtime.run(code)

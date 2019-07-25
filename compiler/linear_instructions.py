@@ -69,6 +69,20 @@ class FunctionCallI(CodeI):
     def __str__(self):
         return "CALL " + self.name + " " + str(self.args)
 
+class MethodCallI(CodeI):
+    def __init__(self, name, mem, args):
+        self.args = args
+        self.mem = mem
+        self.name = name
+
+    def accept(self, visitor):
+        return visitor.visit_methodCallI(self)
+
+    def __str__(self):
+        return "METHOD CALL " + str(self.name) + "." + str(self.mem) + " " + str(self.args)
+
+
+
 
 class VariableI(CodeI):
     def __init__(self, name):

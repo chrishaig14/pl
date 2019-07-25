@@ -71,6 +71,14 @@ class TreeToJson:
         obj["args"] = [arg.accept(self) for arg in function_call.args]
         return obj
 
+
+    def visit_method_call(self, method_call):
+        obj = {}
+        obj["type"] = "function call"
+        obj["member"] = method_call.mem.accept(self)
+        obj["args"] = [arg.accept(self) for arg in method_call.args]
+        return obj
+
     def visit_number(self, number):
         obj = {}
         obj["type"] = "number"

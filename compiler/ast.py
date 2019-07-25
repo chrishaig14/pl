@@ -44,6 +44,15 @@ class FunctionCall:
         return visitor.visit_function_call(self)
 
 
+class MethodCall:
+    def __init__(self, mem, args):
+        self.args = args
+        self.mem = mem
+        self.nodetype = "MethodCall"
+
+    def accept(self, visitor):
+        return visitor.visit_method_call(self)
+
 class Expression:
     def __init__(self, first, op, second):
         self.first = first
@@ -61,6 +70,7 @@ class NewObject:
 
     def accept(self, visitor):
         return visitor.visit_newObject(self)
+
 
 
 class Declaration:

@@ -1,7 +1,7 @@
 from colorama import Fore, Back, Style
 
 from compiler.ast import Expression, Declaration, Assignment, Function, String, Number, Array, FunctionCall, Variable, \
-    If, Return, Block, Program, Class, NewObject, Member, SetMember, SetVariable
+    If, Return, Block, Program, Class, NewObject, Member, SetMember, SetVariable, MethodCall
 
 
 class Parser:
@@ -207,6 +207,10 @@ class Parser:
                 self.advance()
                 self.expect("id")
                 mem = Member(mem, self.previous_token["data"])
+            if self.check("lparen"):
+                self.advance()
+                self.expect("rparen")
+                mem = MethodCall(mem, [])
             return mem
         return a
 

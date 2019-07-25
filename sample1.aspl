@@ -1,11 +1,23 @@
 class Foo{
 	var y;
+	fun foo(){
+		my.y = 34;
+	}
 }
 var x = new Foo;
 x.y = 5;
 var z = x;
 print(x.y);
 print(z.y);
-z.y = 1;
+z.y = 65;
 print(x.y);
 print(z.y);
+z.foo();
+x.foo();
+var we = new Foo;
+we.y = 27;
+print(we.y);
+we.foo();
+print(z.y);
+print(we.y);
+z.foo();

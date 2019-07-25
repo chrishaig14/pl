@@ -70,11 +70,17 @@ class LinearGenerator:
     def visit_class(self, class_s):
         print("VISITING CLASS")
         members = []
+        code = []
         for st in class_s.statements.statements:
             if st.nodetype == "Declaration":
                 members.append(st.name)
+            if st.nodetype == "Function":
+                st.name = class_s.name + "_" + st.name
+                st.params = ["my"] + st.params
+                print("#### VISITING FUNCTION : ", st.name)
+                code += st.accept(self)
         members = {x: None for x in members}
-        code = [FunctionI(class_s.name + "_init", [], BlockI([
+        code += [FunctionI(class_s.name + "_init", [], BlockI([
             DeclareI("new_object"),
             AssignI(RefVariableI("new_object"), ObjectI(class_s.name, members)),
             ReturnI(VariableI("new_object"))
@@ -93,6 +99,25 @@ class LinearGenerator:
         exp_var = add_result(code)
         code += [MemberI(exp_var, member.name)]
         return code
+
+    def visit_method_call(self, method_call):
+        print("VISITING FUNCTION CALL")
+        code = []
+        args = []
+        arg_vars = []
+        for arg in method_call.args:
+            arg = arg.accept(self)
+            code += arg
+            arg_var = add_result(code)
+            arg_vars.append(arg_var)
+        code += method_call.mem.accept(self)
+        # var = add_result(code)
+        memexp= code[-1]
+
+        code[-1] = MethodCallI(memexp.exp, memexp.name, arg_vars)
+        code += [VariableI("__return__")]
+        return code
+
 
     def visit_function_call(self, function_call):
         print("VISITING FUNCTION CALL")
