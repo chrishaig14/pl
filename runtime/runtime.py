@@ -111,12 +111,15 @@ class Runtime:
         # print("ENV AFTER DECLARATION: ", self.env)
 
     def visit_AssignI(self, assignI):
-        # print("lvalue: ", assignI.lvalue)
-        # print("lvalue: ", type(assignI.lvalue))
-        # print("atom: ", assignI.atom)
-        value = assignI.atom.accept(self)
 
-        self.store.assign(assignI.lvalue.accept(self), value)
+        # print("lvalue: ", type(assignI.lvalue))
+
+        value = assignI.atom.accept(self)
+        lvalue = assignI.lvalue.accept(self)
+        print("ASSIGNING:")
+        print("lvalue: ", lvalue)
+        print("rvalue: ", value)
+        self.store.assign(lvalue, value)
 
     def visit_FunctionI(self, functionI):
         # self.globals.define(functionI.name)
@@ -161,7 +164,7 @@ class Runtime:
     def visit_VariableI(self, variableI):
 
         value = self.env.get(variableI.name)
-        # print("VALUE OF VARIABLE: ", variableI.name, " :", value)
+        print("VALUE OF VARIABLE: ", variableI.name, " :", value)
         return value
 
     def visit_MemberI(self, memberI):
@@ -196,10 +199,12 @@ class Runtime:
         self.call_function(class_member,[methodCallI.name])
 
     def call_function(self, proc_val, functionCallargs):
+        print("CALLINF PROC VAL:", proc_val)
         if proc_val.builtin:
             arguments = [self.env.get(arg) for arg in functionCallargs]
             val = proc_val.body(arguments)
             self.env.assign("__return__", val)
+            print("RETURN FROM BULTIN: ", val)
             return val
         args_val = [self.env.get(arg) for arg in functionCallargs]
         env = proc_val.closure.copy()
@@ -235,8 +240,9 @@ class Runtime:
             self.then.run(self.env, self.stack)
 
     def visit_ReturnI(self, returnI):
+        print("RETURNING NAME: ", returnI.name)
         value = returnI.name.accept(self)
-        # print("RETURNING VALUE: ", value)
+        print("RETURNING VALUE: ", value)
         self.env.assign("__return__", value)
         self.stack.leave()
 

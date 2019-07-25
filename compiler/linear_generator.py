@@ -187,6 +187,7 @@ class LinearGenerator:
             builtin = "sub"
 
         code += [FunctionCallI(builtin, [first_var, second_var])]
+        code += [VariableI("__return__")]
         return code
 
     def visit_assignment(self, assignment):

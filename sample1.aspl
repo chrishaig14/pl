@@ -1,23 +1,11 @@
 class Foo{
+	var x;
 	var y;
 	fun foo(){
-		my.y = 34;
+		return my.x + my.y;
 	}
 }
 var x = new Foo;
-x.y = 5;
-var z = x;
-print(x.y);
-print(z.y);
-z.y = 65;
-print(x.y);
-print(z.y);
-z.foo();
-x.foo();
-var we = new Foo;
-we.y = 27;
-print(we.y);
-we.foo();
-print(z.y);
-print(we.y);
-z.foo();
+x.x = 27;
+x.y = 52;
+print(x.foo());
