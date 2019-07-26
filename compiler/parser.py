@@ -66,17 +66,13 @@ class Parser:
             while self.check('mult') or self.check('div'):
                 op = self.current_token["type"]
                 self.advance()
-                print("HERE: op: ", op)
                 term = self.parse_factor()
-                print("SECOND FACTOR: ", term)
                 factor = Expression(factor, op, term)
             return factor
 
     def parse_function(self):
-        print("NOW PARSING A FUNCTION")
         self.match("fun")
         self.expect("id")
-        print("GOT FUNCTION NAME:", self.previous_token["data"])
         name = self.previous_token["data"]
         self.expect("lparen")
         params = []
@@ -129,10 +125,10 @@ class Parser:
         exit(1)
 
     def parse_class(self):
-        print("NOW PARSING A CLASS")
+        # print("NOW PARSING A CLASS")
         self.match("class")
         self.expect("id")
-        print("GOT CLASS NAME:", self.previous_token["data"])
+        # print("GOT CLASS NAME:", self.previous_token["data"])
         name = self.previous_token["data"]
 
         self.expect("lbrace")
@@ -150,7 +146,7 @@ class Parser:
     def parse_minimal(self):
         # factor => number
         if self.match('new'):
-            print("CURRENT TOKEN: ", self.current_token)
+            # print("CURRENT TOKEN: ", self.current_token)
             self.advance()
             return NewObject(self.previous_token["data"])
         if self.match('string'):
@@ -158,16 +154,16 @@ class Parser:
         if self.match('number'):
             return Number(self.previous_token["data"])
         if self.match("lsquare"):
-            print("PARSING ARRAY")
+            # print("PARSING ARRAY")
             values = []
             while values == [] or self.check("comma"):
                 if self.check("comma"):
                     self.advance()
                 val = self.parse_expression()
-                print("VAL: ", val)
+                # print("VAL: ", val)
                 values.append(val)
             self.expect("rsquare")
-            print("ARRAY VALUES: ", values)
+            # print("ARRAY VALUES: ", values)
             return Array(values)
         # factor => id
         if self.match("id"):

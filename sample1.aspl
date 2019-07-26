@@ -1,2 +1,10 @@
-var a = 7*5+1123*123/2;
-print(a);
+class Person {
+	var name;
+	var birth_year;
+	fun get_age(){
+		return 2019 - my.birth_year;
+	}
+}
+var chris = new Person;
+chris.birth_year = 1994;
+print(chris.get_age());
