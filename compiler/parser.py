@@ -22,6 +22,9 @@ class Parser:
         else:
             return lvalue
 
+    def parse_arrayIndex(self):
+        array_expression = self.parse_expression()
+
     def parse_declaration(self):
         # declaration => var id
         if self.check("var"):
@@ -60,14 +63,13 @@ class Parser:
         factor = self.parse_factor()
         if factor is not None:
             # term => factor * term
-            if self.check('mult'):
+            while self.check('mult') or self.check('div'):
+                op = self.current_token["type"]
                 self.advance()
-                term = self.parse_term()
-                return Expression(factor, 'mult', term)
-            if self.check('div'):
-                self.advance()
-                term = self.parse_term()
-                return Expression(factor, 'div', term)
+                print("HERE: op: ", op)
+                term = self.parse_factor()
+                print("SECOND FACTOR: ", term)
+                factor = Expression(factor, op, term)
             return factor
 
     def parse_function(self):

@@ -185,6 +185,10 @@ class LinearGenerator:
             builtin = "sum"
         if expression.op == "minus":
             builtin = "sub"
+        if expression.op == "mult":
+            builtin = "mul"
+        if expression.op == "div":
+            builtin = "div"
 
         code += [FunctionCallI(builtin, [first_var, second_var])]
         code += [VariableI("__return__")]

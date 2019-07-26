@@ -1,11 +1,2 @@
-class Foo{
-	var x;
-	var y;
-	fun foo(){
-		return my.x + my.y;
-	}
-}
-var x = new Foo;
-x.x = 27;
-x.y = 52;
-print(x.foo());
+var a = 7*5+1123*123/2;
+print(a);
