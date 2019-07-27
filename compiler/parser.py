@@ -90,9 +90,6 @@ class Parser:
 
     def parse_class_statement(self):
         # statement => declaration;
-        # if self.check("class"):
-        #     class_s = self.parse_class()
-        #     return class_s
         if self.check("var"):
             decl = self.parse_declaration()
 
@@ -105,30 +102,12 @@ class Parser:
         if self.check("fun"):
             function = self.parse_function()
             return function
-        # if self.check("id"):
-        #     assign = self.parse_assign_exp()
-        #
-        #     self.expect("semicolon")
-        #     if assign is not None:
-        #         return assign
-        # if self.check("return"):
-        #     self.advance()
-        #     exp = self.parse_expression()
-        #
-        #     self.expect("semicolon")
-        #     return Return(exp)
-        # if self.check("if"):
-        #     ifst = self.parse_if()
-        #     return ifst
-
         print("Error: expected statement, got", self.current_token["type"])
         exit(1)
 
     def parse_class(self):
-        # print("NOW PARSING A CLASS")
         self.match("class")
         self.expect("id")
-        # print("GOT CLASS NAME:", self.previous_token["data"])
         name = self.previous_token["data"]
 
         self.expect("lbrace")
@@ -138,15 +117,11 @@ class Parser:
             statements.append(statement)
 
         self.advance()
-        # return Block(statements)
-
-        # statements = self.parse_block()
         return Class(name, Block(statements))
 
     def parse_minimal(self):
         # factor => number
         if self.match('new'):
-            # print("CURRENT TOKEN: ", self.current_token)
             self.advance()
             return NewObject(self.previous_token["data"])
         if self.match('string'):
@@ -154,16 +129,13 @@ class Parser:
         if self.match('number'):
             return Number(self.previous_token["data"])
         if self.match("lsquare"):
-            # print("PARSING ARRAY")
             values = []
             while values == [] or self.check("comma"):
                 if self.check("comma"):
                     self.advance()
                 val = self.parse_expression()
-                # print("VAL: ", val)
                 values.append(val)
             self.expect("rsquare")
-            # print("ARRAY VALUES: ", values)
             return Array(values)
         # factor => id
         if self.match("id"):
